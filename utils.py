@@ -13,7 +13,7 @@ def draw_item_texture(vertices, indices, texture_id, texture_size):
 def draw_quad_texture(v1, v2, v3, v4, texture_id, texture_size):
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, texture_id)
-
+    
     glColor3f(1,1,1)
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
@@ -25,6 +25,19 @@ def draw_quad_texture(v1, v2, v3, v4, texture_id, texture_size):
     glTexCoord2f(0.0, texture_size)
     glVertex3f(v4[0], v4[1], v4[2])
     glEnd()
+
+    # for i in range (100):
+    #     glBegin(GL_QUADS)
+    #     glTexCoord2f(0.0, 0.0)
+    #     glVertex3f(v1[0] + (v1[0]/100)*i, v1[1]+(v1[1]/100)*i, v1[2] + (v1[2]/100)*i)
+    #     glTexCoord2f(texture_size, 0.0)
+    #     glVertex3f(v2[0]+(v2[0]/100)*i, v2[1]+(v2[1]/100)*i, v2[2]+(v2[2]/100)*i)
+    #     glTexCoord2f(texture_size, texture_size)
+    #     glVertex3f(v3[0]+(v3[0]/100)*i, v3[0]+(v3[1]/100)*i, v3[0]+(v3[2]/100)*i)
+    #     glTexCoord2f(0.0, texture_size)
+    #     glVertex3f(v4[0]+(v4[0]/100)*i, v4[0]+(v4[1]/100)*i, v4[0]+(v4[2]/100)*i)
+    #     glEnd()
+    
 
     glDisable(GL_TEXTURE_2D)
 

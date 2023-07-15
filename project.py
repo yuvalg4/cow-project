@@ -12,6 +12,7 @@ from grass import draw_grass
 from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
+import webbrowser
 
 
 #yuv 
@@ -45,25 +46,28 @@ def InitGlut():
     window = glutCreateWindow("Project-Yuval Gabai and Yuval Safran")
 
 def init():
+    createMenu()
+    setup_lighting()
     global grass_texture_id
     glClearColor(153/255, 1, 1, 1) # light blue bg
-    setup_lighting()
+    
     glMatrixMode(GL_MODELVIEW)
     glEnable(GL_DEPTH_TEST)
     glLoadIdentity()
      
+
+
 def myDisplay():
     global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle, right_legs_angle
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     left_legs_angle, right_legs_angle = right_legs_angle, left_legs_angle
-
+    updateLight()
+    
+    draw_lightpost()
     draw_grass()
     draw_fence(4, 0, 0)
-
-    draw_lightpost()
     draw_metallic_object(-20, 20, 0, 10, 10, 10)
-    updateLight()
 
     glPushMatrix()
     glRotatef(angle, 0, 1, 0)
@@ -129,7 +133,7 @@ def keyboard(key, x, y):
     elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
         spotLoc[1] += 1
 
-    elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
+    elif (key == b'B' or key == b'b') and spotLoc[1] > -5: # spotlight lower
         spotLoc[1] -= 1
 
     elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
@@ -161,8 +165,25 @@ def RegisterCallbacks():
     glutKeyboardFunc(keyboard)
     glutReshapeFunc(reshape)
 
+def ProcessMenu(value):
+    if value == 1 :
+        glutLeaveMainLoop()
+
+    if value == 2:
+        webbrowser.open("help.txt")
+    return 1
+
+
+def createMenu():
+    
+    glutAddMenuEntry("Exit", 1)
+    glutAddMenuEntry("Help", 2)
+    glutAttachMenu(GLUT_RIGHT_BUTTON)
+
+
 def main():
     InitGlut()
+    glutCreateMenu(ProcessMenu)
     init()
     RegisterCallbacks()
     glutMainLoop()

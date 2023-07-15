@@ -67,6 +67,7 @@ def setup_lighting():
 def updateLight():
     global spotDir, spotLoc, spotlight_exponent
     #spotlight_position = [spotX, spotY, spotZ, 1.0]  # Position of the spotlight
+    glEnable(GL_NORMALIZE)
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient)
     glLightfv(GL_LIGHT1, GL_POSITION, spotLoc)
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, spotlight_exponent[0])
