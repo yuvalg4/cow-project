@@ -14,7 +14,8 @@ from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
 
 
-#git test
+#yuv 
+
 
 # golbals
 winW, winH = 500, 500
