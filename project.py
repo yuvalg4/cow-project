@@ -217,8 +217,8 @@ def move(key):
                 right_legs_angle = -10
                 last_leg = "left"
         
-        elif part_of_body == "head" and head_angle_u_d > -15:
-            head_angle_u_d -= 5
+        elif part_of_body == "head" and head_angle_u_d < 15:
+            head_angle_u_d += 5
 
         elif part_of_body == "tail" and tail_angle_u_d > -50:
             tail_angle_u_d -= 5
@@ -253,8 +253,8 @@ def move(key):
                 right_legs_angle = -10
                 last_leg = "left"
         
-        elif part_of_body == "head" and head_angle_u_d < 15:
-            head_angle_u_d += 5
+        elif part_of_body == "head" and head_angle_u_d > -30:
+            head_angle_u_d -= 5
 
         elif part_of_body == "tail" and tail_angle_u_d < 0:
             tail_angle_u_d += 5
