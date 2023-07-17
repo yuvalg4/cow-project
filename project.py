@@ -5,7 +5,7 @@ from OpenGL.GLUT import *
 from PIL import Image
 import numpy as np
 import math
-from fence import draw_fence
+from fence import draw_fence, NUM_PARTS, CHANGE
 from cow import cow
 from grass import draw_grass
 from light import setup_lighting, updateLight, draw_lightpost
@@ -41,6 +41,9 @@ last_leg = "left"
 
 part_of_body = "body"
 
+x_fence = 4
+cow_len_z = 6
+
 def InitGlut():
     posX, posY = 100, 100
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA)
@@ -58,25 +61,24 @@ def init():
      
 def myDisplay():
     global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle, right_legs_angle
-    global tail_angle_l_r, tail_angle_u_d, body_loc, body_move
+    global tail_angle_l_r, tail_angle_u_d, body_loc, body_move, x_fence, cow_len_z
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     draw_grass()
-    draw_fence(4, 0, 0)
+    draw_fence(x_fence, 0, 0) 
 
     draw_lightpost()
     draw_metallic_object(-20, 20, 0, 10, 10, 10)
     updateLight()
 
     x, z = body_loc
-    len_z = 6
-    y = (4/3)*len_z
+    y = (4/3)*cow_len_z
 
     glPushMatrix()
     glTranslate(body_move[0],y,body_move[1])
     glRotatef(body_angle, 0, 1, 0)  
     glTranslate(-x,-y,-z)  
-    cow(x, z, len_z, head_angle_l_r, head_angle_u_d, tail_angle_l_r, tail_angle_u_d, left_legs_angle, right_legs_angle)
+    cow(x, z, cow_len_z, head_angle_l_r, head_angle_u_d, tail_angle_l_r, tail_angle_u_d, left_legs_angle, right_legs_angle)
     glPopMatrix()
 
     body_loc = body_move
@@ -161,7 +163,15 @@ def keyboard(key, x, y):
 
 def move(key):
     global head_angle_l_r, head_angle_u_d, head_up_vector, part_of_body, body_loc, body_move, last_leg
-    global tail_angle_l_r, tail_angle_u_d, body_angle, left_legs_angle, right_legs_angle
+    global tail_angle_l_r, tail_angle_u_d, body_angle, left_legs_angle, right_legs_angle, x_fence, cow_len_z
+
+    # Explanation of cheking in body movement:
+    # fence from (x_fence,0,0) to (x_fence + CHANGE*NUM_PARTS,0,0)
+    bounds_z_up = (0 - (2/3)*cow_len_z, 0 + (2/3)*cow_len_z)
+    # then from (x_fence + CHANGE*NUM_PARTS,0,0) to (x_fence + CHANGE*NUM_PARTS,0,CHANGE*NUM_PARTS)
+    bounds_x = (x_fence + CHANGE*NUM_PARTS - (2/3)*cow_len_z, x_fence + CHANGE*NUM_PARTS + (2/3)*cow_len_z)
+    # then from (x_fence + CHANGE*NUM_PARTS,0,CHANGE*NUM_PARTS) to (x_fence,0,CHANGE*NUM_PARTS)
+    bounds_z_down = (-1*CHANGE*NUM_PARTS + (2/3)*cow_len_z, -1*CHANGE*NUM_PARTS - (2/3)*cow_len_z)
 
     if (key == b'j' or key == b'J'):
         if part_of_body == "body":
@@ -206,6 +216,14 @@ def move(key):
             elif 270 <= body_angle < 360:
                 alpha = math.radians(body_angle - 270)
                 body_move = (x + 5*math.cos(alpha),z - 5*math.sin(alpha))
+
+            if ((z < bounds_z_up[0] <= body_move[1] or body_move[1] < bounds_z_up[1] <= z) and 
+                x_fence + CHANGE*NUM_PARTS > x > x_fence) or (
+                (x < bounds_x[0] <= body_move[0] or body_move[0] < bounds_x[1] <= x) and
+                0 > z > -1*CHANGE*NUM_PARTS) or (
+                (z > bounds_z_down[0] >= body_move[1] or body_move[1] > bounds_z_down[1] >= z) and
+                x_fence + CHANGE*NUM_PARTS > x > x_fence):
+                body_move = body_loc
              
             if last_leg == "left":
                 left_legs_angle = -10
@@ -242,6 +260,14 @@ def move(key):
             elif 270 <= body_angle < 360:
                 alpha = math.radians(body_angle - 270)
                 body_move = (x - 5*math.cos(alpha),z + 5*math.sin(alpha))
+
+            if ((z > bounds_z_up[1] >= body_move[1] or body_move[1] > bounds_z_up[0] >= z) and 
+                x_fence + CHANGE*NUM_PARTS > x > x_fence) or (
+                (x > bounds_x[1] >= body_move[0] or body_move[0] > bounds_x[0] >= x) and
+                0 > z > -1*CHANGE*NUM_PARTS) or (
+                (z < bounds_z_down[1] <= body_move[1] or body_move[1] < bounds_z_down[0] <= z) and
+                x_fence + CHANGE*NUM_PARTS > x > x_fence):
+                body_move = body_loc
 
             if last_leg == "left":
                 left_legs_angle = -10
