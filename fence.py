@@ -5,7 +5,7 @@ from utils import draw_item_texture
 from texture import load_texture
 
 def draw_fence(x, y, z):
-    num_parts = 10
+    num_parts = 20
     change = 2
     glColor3f(1, 1, 1)
     for i in range(num_parts):
@@ -14,6 +14,9 @@ def draw_fence(x, y, z):
     for i in range(num_parts):
         draw_one_part_fence(x, y, z)
         z -= change
+    for i in range(num_parts):
+        draw_one_part_fence(x, y, z)
+        x -= change
 
 # gets buttom left pos
 def draw_one_part_fence(x, y, z):

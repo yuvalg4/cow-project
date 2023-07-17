@@ -4,7 +4,6 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from PIL import Image
 import numpy as np
-import time
 import math
 from fence import draw_fence
 from cow import cow
@@ -12,8 +11,6 @@ from grass import draw_grass
 from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
-
-#yuv 
 
 # golbals
 winW, winH = 500, 500
@@ -31,8 +28,18 @@ head_angle_l_r = 0
 head_angle_u_d = 0
 head_up_vector = (0, 1, 0)
 
-left_legs_angle = 10
-right_legs_angle = -10
+tail_angle_l_r = 0
+tail_angle_u_d = 0
+
+body_angle = 0
+body_loc = (0,0)
+body_move = (0,0)
+
+left_legs_angle = 0
+right_legs_angle = 0
+last_leg = "left"
+
+part_of_body = "body"
 
 def InitGlut():
     posX, posY = 100, 100
@@ -43,7 +50,6 @@ def InitGlut():
     window = glutCreateWindow("Project-Yuval Gabai and Yuval Safran")
 
 def init():
-    global grass_texture_id
     glClearColor(153/255, 1, 1, 1) # light blue bg
     setup_lighting()
     glMatrixMode(GL_MODELVIEW)
@@ -52,9 +58,8 @@ def init():
      
 def myDisplay():
     global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle, right_legs_angle
+    global tail_angle_l_r, tail_angle_u_d, body_loc, body_move
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-    left_legs_angle, right_legs_angle = right_legs_angle, left_legs_angle
 
     draw_grass()
     draw_fence(4, 0, 0)
@@ -63,14 +68,22 @@ def myDisplay():
     draw_metallic_object(-20, 20, 0, 10, 10, 10)
     updateLight()
 
+    x, z = body_loc
+    len_z = 6
+    y = (4/3)*len_z
+
     glPushMatrix()
-    glRotatef(angle, 0, 1, 0)
-    cow(0, 0, 6, head_angle_l_r, head_angle_u_d, left_legs_angle, right_legs_angle)
+    glTranslate(body_move[0],y,body_move[1])
+    glRotatef(body_angle, 0, 1, 0)  
+    glTranslate(-x,-y,-z)  
+    cow(x, z, len_z, head_angle_l_r, head_angle_u_d, tail_angle_l_r, tail_angle_u_d, left_legs_angle, right_legs_angle)
     glPopMatrix()
 
-    angle += 8
-    angle %= 360.0
-    time.sleep(0.1)
+    body_loc = body_move
+
+    # update legs when not moving
+    left_legs_angle = 0
+    right_legs_angle = 0
 
     glutSwapBuffers()   
 
@@ -92,42 +105,36 @@ def reshape(width, height):
     gluLookAt(eyeX, eyeY, eyeZ, refX, refY, refZ, upX, upY, upZ)
     
     glMatrixMode(GL_MODELVIEW)
-    
+
 
 def keyboard(key, x, y):
-    global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir, spotlight_exponent, global_ambient
+    global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
+    global spotlight_exponent, global_ambient, part_of_body
     
-    if (key == b'j' or key == b'J') and head_angle_l_r < 30:
-        head_angle_l_r += 5
-        
-    elif (key == b'l' or key == b'L') and head_angle_l_r > -30:
-        head_angle_l_r -= 5
+    move(key)
 
-    elif (key == b'i' or key == b'I') and head_angle_u_d > -15:
-        head_angle_u_d -= 5
-
-    elif (key == b'k' or key == b'K') and head_angle_u_d < 15:
-        head_angle_u_d += 5
-
-    elif (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
+    if (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
         spotLoc[2] -= 1
-        print("T clicked")
+        #print("T clicked")
 
     elif (key == b't' or key == b'T' ) and spotLoc[0] < 1000: # spotlight backward
+        part_of_body = "tail"
         spotLoc[2] += 1
 
     elif (key == b'f' or key == b'F') and spotLoc[0] > -1000 and spotLoc[0] > -1000:  # spotlight right    
         spotLoc[0] += 1
-        print("H clicked")
+        #print("H clicked")
 
     elif (key == b'h' or key == b'H' ):  # spotlight left
+        part_of_body = "head"
         spotLoc[0] -= 1
-        print("F clicked")
+        #print("F clicked")
 
     elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
         spotLoc[1] += 1
 
     elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
+        part_of_body = "body"
         spotLoc[1] -= 1
 
     elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
@@ -151,6 +158,106 @@ def keyboard(key, x, y):
     
     reshape(winW, winH)
     glutPostRedisplay()
+
+def move(key):
+    global head_angle_l_r, head_angle_u_d, head_up_vector, part_of_body, body_loc, body_move, last_leg
+    global tail_angle_l_r, tail_angle_u_d, body_angle, left_legs_angle, right_legs_angle
+
+    if (key == b'j' or key == b'J'):
+        if part_of_body == "body":
+            body_angle += 5
+            if body_angle >= 360:
+                body_angle -= 360
+        
+        elif part_of_body == "head" and head_angle_l_r < 30:
+            head_angle_l_r += 5
+
+        elif part_of_body == "tail" and tail_angle_l_r > -25:
+            tail_angle_l_r -= 5
+        
+    elif (key == b'l' or key == b'L'):
+        if part_of_body == "body":
+            body_angle -= 5
+            if body_angle < 0:
+                body_angle += 360
+        
+        elif part_of_body == "head" and head_angle_l_r > -30:
+            head_angle_l_r -= 5
+
+        elif part_of_body == "tail" and tail_angle_l_r < 25:
+            tail_angle_l_r += 5
+
+    elif (key == b'i' or key == b'I'):
+        if part_of_body == "body":
+            x, z = body_loc
+
+            if 0 <= body_angle < 90:
+                alpha = math.radians(body_angle)
+                body_move = (x - 5*math.sin(alpha),z - 5*math.cos(alpha))
+
+            elif 90 <= body_angle < 180:
+                alpha = math.radians(body_angle - 90)
+                body_move = (x - 5*math.cos(alpha),z + 5*math.sin(alpha))
+
+            elif 180 <= body_angle < 270:
+                alpha = math.radians(body_angle - 180)
+                body_move = (x + 5*math.sin(alpha),z + 5*math.cos(alpha))
+
+            elif 270 <= body_angle < 360:
+                alpha = math.radians(body_angle - 270)
+                body_move = (x + 5*math.cos(alpha),z - 5*math.sin(alpha))
+             
+            if last_leg == "left":
+                left_legs_angle = -10
+                right_legs_angle = 10
+                last_leg = "right"
+
+            elif last_leg == "right":
+                left_legs_angle = 10
+                right_legs_angle = -10
+                last_leg = "left"
+        
+        elif part_of_body == "head" and head_angle_u_d > -15:
+            head_angle_u_d -= 5
+
+        elif part_of_body == "tail" and tail_angle_u_d > -50:
+            tail_angle_u_d -= 5
+
+    elif (key == b'k' or key == b'K'):
+        if part_of_body == "body":
+            x, z = body_loc
+
+            if 0 <= body_angle < 90:
+                alpha = math.radians(body_angle)
+                body_move = (x + 5*math.sin(alpha),z + 5*math.cos(alpha))
+
+            elif 90 <= body_angle < 180:
+                alpha = math.radians(body_angle - 90)
+                body_move = (x + 5*math.cos(alpha),z - 5*math.sin(alpha))
+
+            elif 180 <= body_angle < 270:
+                alpha = math.radians(body_angle - 180)
+                body_move = (x - 5*math.sin(alpha),z - 5*math.cos(alpha))
+
+            elif 270 <= body_angle < 360:
+                alpha = math.radians(body_angle - 270)
+                body_move = (x - 5*math.cos(alpha),z + 5*math.sin(alpha))
+
+            if last_leg == "left":
+                left_legs_angle = -10
+                right_legs_angle = 10
+                last_leg = "right"
+
+            elif last_leg == "right":
+                left_legs_angle = 10
+                right_legs_angle = -10
+                last_leg = "left"
+        
+        elif part_of_body == "head" and head_angle_u_d < 15:
+            head_angle_u_d += 5
+
+        elif part_of_body == "tail" and tail_angle_u_d < 0:
+            tail_angle_u_d += 5
 
 #### Callbacks ####
 def RegisterCallbacks():
