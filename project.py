@@ -11,6 +11,7 @@ from grass import draw_grass
 from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
+import webbrowser
 
 
 # golbals
@@ -54,23 +55,29 @@ def InitGlut():
     window = glutCreateWindow("Project-Yuval Gabai and Yuval Safran")
 
 def init():
-    glClearColor(153/255, 1, 1, 1) # light blue bg
+    createMenu()
     setup_lighting()
+
+    glClearColor(153/255, 1, 1, 1) # light blue bg
+    
     glMatrixMode(GL_MODELVIEW)
     glEnable(GL_DEPTH_TEST)
     glLoadIdentity()
      
+
+
 def myDisplay():
     global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle, right_legs_angle
     global tail_angle_l_r, tail_angle_u_d, body_loc, body_move, x_fence, cow_len_z
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+
     draw_grass()
     draw_fence(x_fence, 0, 0) 
 
     draw_lightpost()
+
     draw_metallic_object(-20, 20, 0, 10, 10, 10)
-    updateLight()
 
     x, z = body_loc
     y = (4/3)*cow_len_z
@@ -136,8 +143,10 @@ def keyboard(key, x, y):
     elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
         spotLoc[1] += 1
 
+
     elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
         part_of_body = "body"
+
         spotLoc[1] -= 1
 
     elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
@@ -293,8 +302,25 @@ def RegisterCallbacks():
     glutKeyboardFunc(keyboard)
     glutReshapeFunc(reshape)
 
+def ProcessMenu(value):
+    if value == 1 :
+        glutLeaveMainLoop()
+
+    if value == 2:
+        webbrowser.open("help.txt")
+    return 1
+
+
+def createMenu():
+    
+    glutAddMenuEntry("Exit", 1)
+    glutAddMenuEntry("Help", 2)
+    glutAttachMenu(GLUT_RIGHT_BUTTON)
+
+
 def main():
     InitGlut()
+    glutCreateMenu(ProcessMenu)
     init()
     RegisterCallbacks()
     glutMainLoop()
