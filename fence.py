@@ -4,16 +4,20 @@ from OpenGL.GLUT import *
 from utils import draw_item_texture
 from texture import load_texture
 
+NUM_PARTS = 20
+CHANGE = 2
+
 def draw_fence(x, y, z):
-    num_parts = 10
-    change = 2
     glColor3f(1, 1, 1)
-    for i in range(num_parts):
+    for i in range(NUM_PARTS):
         draw_one_part_fence(x, y, z)
-        x += change
-    for i in range(num_parts):
+        x += CHANGE
+    for i in range(NUM_PARTS):
         draw_one_part_fence(x, y, z)
-        z -= change
+        z -= CHANGE
+    for i in range(NUM_PARTS):
+        draw_one_part_fence(x, y, z)
+        x -= CHANGE
 
 # gets buttom left pos
 def draw_one_part_fence(x, y, z):

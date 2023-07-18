@@ -5,7 +5,7 @@ from texture import load_texture
 from utils import draw_quad, draw_quad_texture, draw_item, draw_item_texture
 
 def cow(center_x, center_z, len_z, head_angle_display_r, head_angle_display_u, 
-        left_legs_angle, right_legs_angle):
+        tail_angle_display_r, tail_angle_display_u, left_legs_angle, right_legs_angle):
     leg_len = len_z
     len_x = len_y = (2/3)*len_z
     center_y = len_y/2 + leg_len
@@ -14,13 +14,13 @@ def cow(center_x, center_z, len_z, head_angle_display_r, head_angle_display_u,
     glColor3f(1, 1, 1)
     draw_body(center_x, center_y, center_z, len_x, len_y, len_z)
     # head
-    glColor3f(1, 0, 0)
     head_x = center_x
     head_y = center_y + (1/3)*len_y
     head_z = center_z - (3/7)*len_z
     draw_head(head_x, head_y, head_z, len_x, head_angle_display_r, head_angle_display_u)
     # legs
-    draw_tail(center_x, center_y - (1/2)*len_y, center_z + (3/4)*len_z, (3/4)*len_x, 0, (0,0,1))
+    draw_tail(center_x, center_y, center_z + (7/8)*len_z, len_x, 
+              tail_angle_display_r, tail_angle_display_u)
     draw_legs(center_x, center_y, center_z, len_x, len_z, left_legs_angle, right_legs_angle)
 
 def draw_legs(center_x, center_y, center_z, len_x, len_z, left_angle, right_angle):
@@ -209,16 +209,34 @@ def draw_udders(center_x, center_y, center_z, len):
     draw_solid_sphere(center_x + len/2, teat_y, center_z - len/2, teat_weidth, len, teat_weidth)
     draw_solid_sphere(center_x + len/2, teat_y, center_z + len/2, teat_weidth, len, teat_weidth)
 
-def draw_tail(x, y, z, len, angle, axis): # (x,y,z) attachment point to the body
-    glColor3f(0, 0, 0)
-    center_x = x
-    center_y = y 
-    center_z = z + len/2
-    x_axis, y_axis, z_axis = axis
+def draw_tail(x, y, z, len, tail_angle_display_r, tail_angle_display_u): 
+    # (x,y,z) attachment point to the body  
     tail_weidth = (1/4)*len
+
+    vertices = [(x + (1/2)*tail_weidth, y, z), #0
+                (x - (1/2)*tail_weidth, y, z), #1
+                (x + (1/2)*tail_weidth, y, z + tail_weidth), #2
+                (x - (1/2)*tail_weidth, y, z + tail_weidth), #3
+                (x + (1/2)*tail_weidth, y - len, z), #4
+                (x - (1/2)*tail_weidth, y - len, z), #5
+                (x + (1/2)*tail_weidth, y - len, z + tail_weidth), #6
+                (x - (1/2)*tail_weidth, y - len, z + tail_weidth)] #7
+    indices = [((0, 1, 3, 2), 0),
+               ((4, 5, 7, 6), 0),
+               ((0, 1, 5, 4), 0),
+               ((0, 2, 6, 4), 0),
+               ((2, 3, 7, 6), 0),
+               ((3, 1, 5, 7), 0)]
+    
     glPushMatrix()
-    glRotatef(angle, x_axis, y_axis, z_axis)
-    draw_solid_sphere(center_x, center_y, center_z, tail_weidth, len, tail_weidth)
+    glTranslate(x,y,z)
+    glRotatef(tail_angle_display_r, 0, 0, 1)
+    glRotatef(tail_angle_display_u, 1, 0, 0)
+    glTranslate(-x,-y,-z)
+    draw_item(vertices, indices, [(0,0,0)])
+    glColor3f(1, 1, 1)
+    draw_solid_sphere(x, y - len - (1/2)*tail_weidth, z + (1/2)*tail_weidth, (2/3)*tail_weidth, 
+                      (3/2)*tail_weidth, (2/3)*tail_weidth)
     glPopMatrix()
 
 def draw_solid_sphere(center_x, center_y, center_z, len_x, len_y, len_z):

@@ -70,8 +70,8 @@ def updateLight():
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient)
     glLightfv(GL_LIGHT1, GL_POSITION, spotLoc)
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, spotlight_exponent[0])
-    print("x is " + str(spotLoc))
-    print("exponent is" + str(spotlight_exponent[0]))
+    #print("x is " + str(spotLoc))
+    #print("exponent is" + str(spotlight_exponent[0]))
     
     lineWidth = 2.0
     glLineWidth(lineWidth)
