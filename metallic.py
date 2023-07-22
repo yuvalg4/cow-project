@@ -8,6 +8,7 @@ def draw_metallic_object(center_x, center_y, center_z, len_x, len_y, len_z):
     diffuseColorArray = [0.1, 0.1, 0.1, 1.0]
     specularColorArray = [1.0, 1.0, 1.0, 1.0]
     shininessValue = 100.0
+    glColor3f(0.714, 0.714, 0.714)
 
     glMaterial(GL_FRONT, GL_AMBIENT, ambientColorArray)
     glMaterial(GL_FRONT, GL_DIFFUSE, diffuseColorArray)

@@ -127,4 +127,17 @@ def draw_lightpost():
                (4, 7, 8)]
     
     draw_item_texture(vertices, indices, fence_texture_id, 1)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    glColor4f(1, 0.961, 0.714, 0.8)
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1.0, 1.0, 1.0, 1.0))
+    glMaterialfv(GL_FRONT, GL_SPECULAR, (1.0, 1.0, 1.0, 1.0))
+    glMaterialfv(GL_FRONT, GL_SHININESS, 100)
+    glPushMatrix()
+    glTranslatef(x+0.5, spotLoc[1]-0.5, z)
+    quad = gluNewQuadric()
+    gluSphere(quad, 2, 50, 50)
+    #glScalef(len_x, len_y, len_z)
+    glPopMatrix()
+    glDisable(GL_BLEND)
     
