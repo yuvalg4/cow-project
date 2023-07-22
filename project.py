@@ -125,45 +125,55 @@ def keyboard(key, x, y):
 
     if (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
         spotLoc[2] -= 1
+        updateLight()
         #print("T clicked")
 
     elif (key == b't' or key == b'T' ) and spotLoc[0] < 1000: # spotlight backward
         part_of_body = "tail"
         spotLoc[2] += 1
+        updateLight()
 
     elif (key == b'f' or key == b'F') and spotLoc[0] > -1000 and spotLoc[0] > -1000:  # spotlight right    
         spotLoc[0] += 1
+        updateLight()
         #print("H clicked")
 
     elif (key == b'h' or key == b'H' ):  # spotlight left
         part_of_body = "head"
         spotLoc[0] -= 1
+        updateLight()
         #print("F clicked")
 
     elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
         spotLoc[1] += 1
+        updateLight()
 
 
     elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
         part_of_body = "body"
 
         spotLoc[1] -= 1
+        updateLight()
 
     elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
         spotlight_exponent[0] += 5
+        updateLight()
 
     elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
         spotlight_exponent[0] -= 5
+        updateLight()
 
     elif(key == b'0') and global_ambient[0] < 1.0:
         global_ambient[0] += 0.05 
         global_ambient[1] += 0.05
         global_ambient[2] += 0.05
+        updateLight()
 
     elif(key == b'9') and global_ambient[0] > 0.0:
         global_ambient[0] -= 0.05 
         global_ambient[1] -= 0.05
         global_ambient[2] -= 0.05
+        updateLight()
         
     else:
         return
