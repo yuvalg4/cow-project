@@ -15,8 +15,9 @@ def setup_lighting():
 
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0) 
-    glEnable(GL_NORMALIZE)
     glEnable(GL_LIGHT1)
+    glEnable(GL_NORMALIZE)
+    
 
     # Set light parameters for sunlight
     sunlight_position = [-30, 100, -20, 1.0]  # Position of the sunlight
@@ -32,7 +33,7 @@ def setup_lighting():
 
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient)
 
-    #glLightfv(GL_LIGHT0, GL_POSITION, sunlight_position)
+    glLightfv(GL_LIGHT0, GL_POSITION, sunlight_position)
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse)
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light)
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular)
@@ -74,15 +75,7 @@ def updateLight():
     #print("x is " + str(spotLoc))
     #print("exponent is" + str(spotlight_exponent[0]))
     
-    lineWidth = 2.0
-    glLineWidth(lineWidth)
-    glColor3f(1.0, 1.0, 0.0)  # Yellow color
-
-    # Render the line representing the spotlight
-    glBegin(GL_LINES)
-    glVertex3f(spotLoc[0], spotLoc[1], spotLoc[2])  # Line start point
-    glVertex3f(spotLoc[0] + spotDir[0], spotLoc[1]+ spotDir[1], spotLoc[2] + spotDir[2])      # Line end point
-    glEnd()
+    
     # glPushMatrix()
     # glTranslatef(spotLoc[0], spotLoc[1], spotLoc[2])
     # quad = gluNewQuadric()
@@ -127,6 +120,16 @@ def draw_lightpost():
                (4, 7, 8)]
     
     draw_item_texture(vertices, indices, fence_texture_id, 1)
+    lineWidth = 2.0
+    glLineWidth(lineWidth)
+    glColor3f(1.0, 1.0, 0.0)  # Yellow color
+
+    # Render the line representing the spotlight
+    glBegin(GL_LINES)
+    glVertex3f(spotLoc[0], spotLoc[1], spotLoc[2])  # Line start point
+    glVertex3f(spotLoc[0] + spotDir[0], spotLoc[1]+ spotDir[1], spotLoc[2] + spotDir[2])      # Line end point
+    glEnd()
+    
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glColor4f(1, 0.961, 0.714, 0.8)
@@ -134,10 +137,16 @@ def draw_lightpost():
     glMaterialfv(GL_FRONT, GL_SPECULAR, (1.0, 1.0, 1.0, 1.0))
     glMaterialfv(GL_FRONT, GL_SHININESS, 100)
     glPushMatrix()
-    glTranslatef(x+0.5, spotLoc[1]-0.5, z)
-    quad = gluNewQuadric()
-    gluSphere(quad, 2, 50, 50)
+    
+    glTranslatef(x - 2.12132 , spotLoc[1]-1.5, z)
+    glRotate(145, 0, 1, 0)
+    glRotate(-25, 1, 0, 0)
+    # quad = gluNewQuadric()
+    # gluSphere(quad, 2, 50, 50)
     #glScalef(len_x, len_y, len_z)
+    gluCylinder(gluNewQuadric(), 3.0, 0.0, 5.0, 10, 10)  # Draw the cone
+    
+
     glPopMatrix()
     glDisable(GL_BLEND)
     
