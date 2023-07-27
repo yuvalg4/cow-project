@@ -5,7 +5,7 @@ from utils import draw_item_texture
 from texture import load_texture
 
 #spotlight params:
-spotLoc = [16, 20, 0, 1]  # Position of the spotlight
+spotLoc = [-12, 20, -25, 1]  # Position of the spotlight
 spotDir = [-5, -5 , 5]  # Direction of the spotlight
 spotlight_exponent = [20.0]  # Exponent that controls the intensity distribution of the spotlight
 global_ambient = [0.4, 0.4, 0.4, 1.0] # global ambient lighting
@@ -138,7 +138,7 @@ def draw_lightpost():
     glMaterialfv(GL_FRONT, GL_SHININESS, 100)
     glPushMatrix()
     
-    glTranslatef(x - 2.12132 , spotLoc[1]-1.5, z)
+    glTranslatef(x - 1 , spotLoc[1]-1.5, z+3.5)
     glRotate(145, 0, 1, 0)
     glRotate(-25, 1, 0, 0)
     # quad = gluNewQuadric()

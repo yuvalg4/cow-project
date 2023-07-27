@@ -14,37 +14,36 @@ def draw_grass():
     glMaterial(GL_FRONT, GL_AMBIENT, ambientColorArray)
     glMaterial(GL_FRONT, GL_DIFFUSE, diffuseColorArray)
     field_size = 100
-    texture_size = 1
-    v1 = (-1*field_size, 0, -1*field_size)
-    v2 = (field_size, 0, -1*field_size)
-    v3 = (field_size, 0, field_size)
-    v4 = (-1*field_size, 0, field_size)
+    texture_size = 2
+    # v1 = (-1*field_size, 0, -1*field_size)
+    # v2 = (field_size, 0, -1*field_size)
+    # v3 = (field_size, 0, field_size)
+    # v4 = (-1*field_size, 0, field_size)
     #draw_quad_texture(v1, v2, v3, v4, grass_texture_id, texture_size)
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, grass_texture_id)
     gridSize = 5
-    floorSize = field_size
-    cellSize = floorSize / gridSize
-    floorHeight = -1.0
+    cellSize = field_size / gridSize
+    groundHeight = -1.0
 
     for x in range(gridSize):
         for z in range(gridSize):
             glBegin(GL_QUADS)
             
 
-            x0 = -floorSize / 2.0 + x * cellSize
-            z0 = -floorSize / 2.0 + z * cellSize
+            x0 = -field_size / 2.0 + x * cellSize
+            z0 = -field_size / 2.0 + z * cellSize
             glTexCoord2f(0.0, 0.0)  
-            glVertex3f(x0, floorHeight, z0)
+            glVertex3f(x0, groundHeight, z0)
             glTexCoord2f(texture_size, 0.0)
 
-            glVertex3f(x0 + cellSize, floorHeight, z0)
+            glVertex3f(x0 + cellSize, groundHeight, z0)
             glTexCoord2f(texture_size, texture_size)
 
-            glVertex3f(x0 + cellSize, floorHeight, z0 + cellSize)
+            glVertex3f(x0 + cellSize, groundHeight, z0 + cellSize)
             glTexCoord2f(0.0, texture_size)
 
-            glVertex3f(x0, floorHeight, z0 + cellSize)
+            glVertex3f(x0, groundHeight, z0 + cellSize)
 
             glEnd()
     glDisable(GL_TEXTURE_2D)
