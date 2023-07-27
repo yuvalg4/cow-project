@@ -13,6 +13,11 @@ from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
 import webbrowser
 
+input_text = ""
+cursor_position = 0
+max_input_length = 20
+input = False
+
 
 # golbals
 winW, winH = 500, 500
@@ -120,53 +125,82 @@ def reshape(width, height):
 def keyboard(key, x, y):
     global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
     global spotlight_exponent, global_ambient, part_of_body
+    global input_text, cursor_position, input
     
-    move(key)
-
-    if (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
-        spotLoc[2] -= 1
-        #print("T clicked")
-
-    elif (key == b't' or key == b'T' ) and spotLoc[0] < 1000: # spotlight backward
-        part_of_body = "tail"
-        spotLoc[2] += 1
-
-    elif (key == b'f' or key == b'F') and spotLoc[0] > -1000 and spotLoc[0] > -1000:  # spotlight right    
-        spotLoc[0] += 1
-        #print("H clicked")
-
-    elif (key == b'h' or key == b'H' ):  # spotlight left
-        part_of_body = "head"
-        spotLoc[0] -= 1
-        #print("F clicked")
-
-    elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
-        spotLoc[1] += 1
-
-
-    elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
-        part_of_body = "body"
-
-        spotLoc[1] -= 1
-
-    elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
-        spotlight_exponent[0] += 5
-
-    elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
-        spotlight_exponent[0] -= 5
-
-    elif(key == b'0') and global_ambient[0] < 1.0:
-        global_ambient[0] += 0.05 
-        global_ambient[1] += 0.05
-        global_ambient[2] += 0.05
-
-    elif(key == b'9') and global_ambient[0] > 0.0:
-        global_ambient[0] -= 0.05 
-        global_ambient[1] -= 0.05
-        global_ambient[2] -= 0.05
-        
+    if input == True:
+        if key == b'\r' or key == b'\x03':  # Enter or Ctrl+C to finish input
+            print("Entered data:", input_text)
+            draw_text(5, 5, input_text)
+            input_text = ""
+            cursor_position = 0
+            input = False
+        elif key == b'\x08':  # Backspace to delete characters
+            if cursor_position > 0:
+                input_text = input_text[:cursor_position - 1] + input_text[cursor_position:]
+                cursor_position -= 1
+        elif key.isalnum() and len(input_text) < max_input_length:  # Allow alphanumeric characters
+            input_text = input_text[:cursor_position] + key.decode('utf-8') + input_text[cursor_position:]
+            cursor_position += 1
+    
     else:
-        return
+            
+        move(key)
+
+        if (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
+            spotLoc[2] -= 1
+            updateLight()
+            #print("T clicked")
+
+        elif (key == b't' or key == b'T' ) and spotLoc[0] < 1000: # spotlight backward
+            part_of_body = "tail"
+            spotLoc[2] += 1
+            updateLight()
+
+        elif (key == b'f' or key == b'F') and spotLoc[0] > -1000 and spotLoc[0] > -1000:  # spotlight right    
+            spotLoc[0] += 1
+            updateLight()
+            #print("H clicked")
+
+        elif (key == b'h' or key == b'H' ):  # spotlight left
+            part_of_body = "head"
+            spotLoc[0] -= 1
+            updateLight()
+            #print("F clicked")
+
+        elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
+            spotLoc[1] += 1
+            updateLight()
+
+
+        elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
+            part_of_body = "body"
+
+            spotLoc[1] -= 1
+            updateLight()
+
+        elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
+            spotlight_exponent[0] += 5
+            updateLight()
+
+        elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
+            spotlight_exponent[0] -= 5
+            updateLight()
+
+        elif(key == b'0') and global_ambient[0] < 1.0:
+            global_ambient[0] += 0.05 
+            global_ambient[1] += 0.05
+            global_ambient[2] += 0.05
+            updateLight()
+
+        elif(key == b'9') and global_ambient[0] > 0.0:
+            global_ambient[0] -= 0.05 
+            global_ambient[1] -= 0.05
+            global_ambient[2] -= 0.05
+            updateLight()
+
+            
+        else:
+            return
     
     reshape(winW, winH)
     glutPostRedisplay()
@@ -303,11 +337,17 @@ def RegisterCallbacks():
     glutReshapeFunc(reshape)
 
 def ProcessMenu(value):
+    global input
     if value == 1 :
         glutLeaveMainLoop()
 
     if value == 2:
         webbrowser.open("help.txt")
+
+    if value == 3:
+       draw_ambient_input()
+       input = True 
+       
     return 1
 
 
@@ -315,7 +355,32 @@ def createMenu():
     
     glutAddMenuEntry("Exit", 1)
     glutAddMenuEntry("Help", 2)
+    glutAddMenuEntry("Set Ambient Light", 3)
     glutAttachMenu(GLUT_RIGHT_BUTTON)
+
+def draw_text(x, y, text):
+    glWindowPos2f(x, y)
+    for character in text:
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ord(character))
+
+def draw_ambient_input():
+    glClear(GL_COLOR_BUFFER_BIT)
+    # Implement your rendering here
+
+    # Draw the data entry area
+    glColor3f(0.8, 0.8, 0.8)
+    glBegin(GL_QUADS)
+    glVertex2f(100, 100)
+    glVertex2f(300, 100)
+    glVertex2f(300, 140)
+    glVertex2f(100, 140)
+    glEnd()
+
+    # Draw the entered text
+    glColor3f(0, 0, 0)
+    draw_text(105, 110, input_text)
+
+    glFlush()
 
 
 def main():
