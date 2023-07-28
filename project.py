@@ -87,7 +87,7 @@ def myDisplay():
 
     draw_lightpost()
 
-    draw_metallic_object(-20, 20, 0, 10, 10, 10)
+    draw_metallic_object(-20, 30, 50, 10, 10, 10)
 
     x, z = body_loc
     y = (4/3)*cow_len_z

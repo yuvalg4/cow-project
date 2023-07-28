@@ -5,7 +5,7 @@ from utils import draw_item_texture
 from texture import load_texture
 
 #spotlight params:
-spotLoc = [-12, 20, -25, 1]  # Position of the spotlight
+spotLoc = [16, 20, 25, 1]  # Position of the spotlight
 spotDir = [-5, -5 , 5]  # Direction of the spotlight
 spotlight_exponent = [20.0]  # Exponent that controls the intensity distribution of the spotlight
 global_ambient = [0.4, 0.4, 0.4, 1.0] # global ambient lighting
@@ -15,12 +15,13 @@ def setup_lighting():
 
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0) 
-    glEnable(GL_LIGHT1)
+    #glEnable(GL_LIGHT1)
     glEnable(GL_NORMALIZE)
     
 
     # Set light parameters for sunlight
-    sunlight_position = [-30, 100, -20, 1.0]  # Position of the sunlight
+    sunlight_position = [-20, 20, -20, 0.0]  # Position of the sunlight
+    sunlight_dir = [-1, -1, -1, -1.0]  # direction of the sunlight
     sunlight_color = [1.0, 1.0, 1.0, 1.0]  # Color of the sunlight
     ambient_light = [0.1, 0.1, 0.1, 1.0]  
     diffuse = [0.5, 0.5, 0.5, 1.0]  # K diffuse reflection
@@ -34,6 +35,7 @@ def setup_lighting():
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient)
 
     glLightfv(GL_LIGHT0, GL_POSITION, sunlight_position)
+    #glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, sunlight_dir)
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse)
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light)
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular)
