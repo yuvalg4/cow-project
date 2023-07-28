@@ -12,13 +12,8 @@ from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
 import webbrowser
+
 from tkinter import Tk, simpledialog
-
-input_text = ""
-cursor_position = 0
-max_input_length = 20
-input = False
-
 
 # golbals
 winW, winH = 500, 500
@@ -126,82 +121,64 @@ def reshape(width, height):
 def keyboard(key, x, y):
     global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
     global spotlight_exponent, global_ambient, part_of_body
-    global input_text, cursor_position, input
-    
-    if input == True:
-        if key == b'\r' or key == b'\x03':  # Enter or Ctrl+C to finish input
-            print("Entered data:", input_text)
-            draw_text(5, 5, input_text)
-            input_text = ""
-            cursor_position = 0
-            input = False
-        elif key == b'\x08':  # Backspace to delete characters
-            if cursor_position > 0:
-                input_text = input_text[:cursor_position - 1] + input_text[cursor_position:]
-                cursor_position -= 1
-        elif key.isalnum() and len(input_text) < max_input_length:  # Allow alphanumeric characters
-            input_text = input_text[:cursor_position] + key.decode('utf-8') + input_text[cursor_position:]
-            cursor_position += 1
-    
+            
+    move(key)
+
+    if (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
+        spotLoc[2] -= 1
+        updateLight()
+        #print("T clicked")
+
+    elif (key == b't' or key == b'T' ) and spotLoc[0] < 1000: # spotlight backward
+        part_of_body = "tail"
+        spotLoc[2] += 1
+        updateLight()
+
+    elif (key == b'f' or key == b'F') and spotLoc[0] > -1000 and spotLoc[0] > -1000:  # spotlight right    
+        spotLoc[0] += 1
+        updateLight()
+        #print("H clicked")
+
+    elif (key == b'h' or key == b'H' ):  # spotlight left
+        part_of_body = "head"
+        spotLoc[0] -= 1
+        updateLight()
+        #print("F clicked")
+
+    elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
+        spotLoc[1] += 1
+        updateLight()
+
+
+    elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
+        part_of_body = "body"
+
+        spotLoc[1] -= 1
+        updateLight()
+
+    elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
+        spotlight_exponent[0] += 5
+        updateLight()
+
+    elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
+        spotlight_exponent[0] -= 5
+        updateLight()
+
+    elif(key == b'0') and global_ambient[0] < 1.0:
+        global_ambient[0] += 0.05 
+        global_ambient[1] += 0.05
+        global_ambient[2] += 0.05
+        updateLight()
+
+    elif(key == b'9') and global_ambient[0] > 0.0:
+        global_ambient[0] -= 0.05 
+        global_ambient[1] -= 0.05
+        global_ambient[2] -= 0.05
+        updateLight()
+
+        
     else:
-            
-        move(key)
-
-        if (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
-            spotLoc[2] -= 1
-            updateLight()
-            #print("T clicked")
-
-        elif (key == b't' or key == b'T' ) and spotLoc[0] < 1000: # spotlight backward
-            part_of_body = "tail"
-            spotLoc[2] += 1
-            updateLight()
-
-        elif (key == b'f' or key == b'F') and spotLoc[0] > -1000 and spotLoc[0] > -1000:  # spotlight right    
-            spotLoc[0] += 1
-            updateLight()
-            #print("H clicked")
-
-        elif (key == b'h' or key == b'H' ):  # spotlight left
-            part_of_body = "head"
-            spotLoc[0] -= 1
-            updateLight()
-            #print("F clicked")
-
-        elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
-            spotLoc[1] += 1
-            updateLight()
-
-
-        elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
-            part_of_body = "body"
-
-            spotLoc[1] -= 1
-            updateLight()
-
-        elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
-            spotlight_exponent[0] += 5
-            updateLight()
-
-        elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
-            spotlight_exponent[0] -= 5
-            updateLight()
-
-        elif(key == b'0') and global_ambient[0] < 1.0:
-            global_ambient[0] += 0.05 
-            global_ambient[1] += 0.05
-            global_ambient[2] += 0.05
-            updateLight()
-
-        elif(key == b'9') and global_ambient[0] > 0.0:
-            global_ambient[0] -= 0.05 
-            global_ambient[1] -= 0.05
-            global_ambient[2] -= 0.05
-            updateLight()
-
-            
-        else:
-            return
+        return
     
     reshape(winW, winH)
     glutPostRedisplay()
@@ -354,37 +331,37 @@ def popUpInput(winTitle, winPrompt):
 def ProcessAmbientMenu(value):
     global global_ambient
     if value == 1 :
-        print("starting ambient R setting")
+        #print("starting ambient R setting")
         user_input = popUpInput("Red Value Setting", "Input Ambient R Value")
         if user_input != None:
-            print(f'user input is: ',user_input)
+            #print(f'user input is: ',user_input)
             global_ambient[0] = float(user_input)
-            print("updated ambient R")
+            #print("updated ambient R")
             
 
 
     elif value == 2:
-        print("starting ambient G setting")
+        #print("starting ambient G setting")
         user_input = popUpInput("Green Value Setting", "Input Ambient G Value")
         if user_input != None:
-            print(f'user input is: ',user_input)
+            #print(f'user input is: ',user_input)
             global_ambient[1] = float(user_input)
-            print("updated ambient G")
+            #print("updated ambient G")
 
     elif value == 3:
-        print("starting ambient B setting")
+        #print("starting ambient B setting")
         user_input = popUpInput("Blue Value Setting", "Input Ambient B Value")
         if user_input != None:
-            print(f'user input is: ',user_input)
+            #print(f'user input is: ',user_input)
             global_ambient[2] = float(user_input)
-            print("updated ambient B")
+            #print("updated ambient B")
     
     elif value == 4:
         global_ambient[0], global_ambient[1], global_ambient[2] = 0.4, 0.4, 0.4 
        
-    print(f'ambient R is: ', global_ambient[0])
-    print(f'ambient G is: ', global_ambient[1])
-    print(f'ambient B is: ', global_ambient[2])
+    # print(f'ambient R is: ', global_ambient[0])
+    # print(f'ambient G is: ', global_ambient[1])
+    # print(f'ambient B is: ', global_ambient[2])
     updateLight()
     return 1
 
