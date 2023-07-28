@@ -12,6 +12,7 @@ from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
 import webbrowser
+from tkinter import Tk, simpledialog
 
 input_text = ""
 cursor_position = 0
@@ -60,7 +61,7 @@ def InitGlut():
     window = glutCreateWindow("Project-Yuval Gabai and Yuval Safran")
 
 def init():
-    createMenu()
+    createMainMenu()
     setup_lighting()
 
     glClearColor(153/255, 1, 1, 1) # light blue bg
@@ -336,56 +337,87 @@ def RegisterCallbacks():
     glutKeyboardFunc(keyboard)
     glutReshapeFunc(reshape)
 
+
+def popUpInput(winTitle, winPrompt):
+    root = Tk()
+    root.withdraw()
+    userInput = -1
+    while userInput != None:
+        userInput = simpledialog.askfloat(title=winTitle, prompt=winPrompt)
+        if userInput != None and userInput >= 0 and userInput <= 1:
+            root.destroy()
+            return userInput
+    
+    root.destroy()
+    return userInput
+
+def ProcessAmbientMenu(value):
+    global global_ambient
+    if value == 1 :
+        print("starting ambient R setting")
+        user_input = popUpInput("Red Value Setting", "Input Ambient R Value")
+        if user_input != None:
+            print(f'user input is: ',user_input)
+            global_ambient[0] = float(user_input)
+            print("updated ambient R")
+            
+
+
+    elif value == 2:
+        print("starting ambient G setting")
+        user_input = popUpInput("Green Value Setting", "Input Ambient G Value")
+        if user_input != None:
+            print(f'user input is: ',user_input)
+            global_ambient[1] = float(user_input)
+            print("updated ambient G")
+
+    elif value == 3:
+        print("starting ambient B setting")
+        user_input = popUpInput("Blue Value Setting", "Input Ambient B Value")
+        if user_input != None:
+            print(f'user input is: ',user_input)
+            global_ambient[2] = float(user_input)
+            print("updated ambient B")
+    
+    elif value == 4:
+        global_ambient[0], global_ambient[1], global_ambient[2] = 0.4, 0.4, 0.4 
+       
+    print(f'ambient R is: ', global_ambient[0])
+    print(f'ambient G is: ', global_ambient[1])
+    print(f'ambient B is: ', global_ambient[2])
+    updateLight()
+    return 1
+
+
+def createAmbientMenu():
+    glutAddMenuEntry("Set Red Ambient Value", 1)
+    glutAddMenuEntry("Set Green Ambient Value", 2)
+    glutAddMenuEntry("Set Blue Ambient Value", 3)
+    glutAddMenuEntry("Reset To Default", 4)
+
+
 def ProcessMenu(value):
-    global input
     if value == 1 :
         glutLeaveMainLoop()
 
     if value == 2:
         webbrowser.open("help.txt")
-
-    if value == 3:
-       draw_ambient_input()
-       input = True 
        
     return 1
 
 
-def createMenu():
-    
+def createMainMenu():
+    ambientMenu = glutCreateMenu(ProcessAmbientMenu)
+    createAmbientMenu()
+    glutCreateMenu(ProcessMenu)
     glutAddMenuEntry("Exit", 1)
     glutAddMenuEntry("Help", 2)
-    glutAddMenuEntry("Set Ambient Light", 3)
+    glutAddSubMenu("Adjust Ambient Light", ambientMenu)
     glutAttachMenu(GLUT_RIGHT_BUTTON)
-
-def draw_text(x, y, text):
-    glWindowPos2f(x, y)
-    for character in text:
-        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ord(character))
-
-def draw_ambient_input():
-    glClear(GL_COLOR_BUFFER_BIT)
-    # Implement your rendering here
-
-    # Draw the data entry area
-    glColor3f(0.8, 0.8, 0.8)
-    glBegin(GL_QUADS)
-    glVertex2f(100, 100)
-    glVertex2f(300, 100)
-    glVertex2f(300, 140)
-    glVertex2f(100, 140)
-    glEnd()
-
-    # Draw the entered text
-    glColor3f(0, 0, 0)
-    draw_text(105, 110, input_text)
-
-    glFlush()
 
 
 def main():
     InitGlut()
-    glutCreateMenu(ProcessMenu)
     init()
     RegisterCallbacks()
     glutMainLoop()
