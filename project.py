@@ -13,6 +13,7 @@ from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
 from rock import draw_rocks_and_sword
 
+
 # golbals
 winW, winH = 500, 500
 angle = 0
