@@ -108,7 +108,32 @@ def draw_sword(x,y,z):
                ((3, 0, 4, 7),0),
                ((4,5,6,7),0)]
     
+
+    # Material properties for metallic appearance
+    mat_ambient = [0.1, 0.1, 0.1, 1.0]   # Ambient color (r, g, b, a)
+    mat_diffuse = [0.5, 0.5, 0.5, 1.0]   # Diffuse color (r, g, b, a)
+    mat_specular = [0.9, 0.9, 0.9, 1.0]  # Specular color (r, g, b, a)
+    mat_shininess = 100.0
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient)
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse)
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular)
+    glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess)
+
     draw_item(vertices, indices, [(192/255,192/255,192/255)])
+
+    mat_ambient = [0.2, 0.2, 0.2, 1.0]   # Ambient color (r, g, b, a)
+    mat_diffuse = [0.8, 0.8, 0.8, 1.0]   # Diffuse color (r, g, b, a)
+    mat_specular = [0.0, 0.0, 0.0, 1.0]  # Specular color (r, g, b, a)
+    mat_shininess = 0.0
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient)
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse)
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular)
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess)
+
+
+
     x, y, z = vertices[8]
     draw_hilt(x, y, z, 0, 4)
     draw_hilt(x, y+1, z, 90, 1.5)

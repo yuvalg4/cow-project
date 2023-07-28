@@ -5,7 +5,7 @@ from utils import draw_item_texture
 from texture import load_texture
 
 #spotlight params:
-spotLoc = [16, 20, 25, 1]  # Position of the spotlight
+spotLoc = [-16, 20, -20, 1]  # Position of the spotlight
 spotDir = [-5, -5 , 5]  # Direction of the spotlight
 spotlight_exponent = [20.0]  # Exponent that controls the intensity distribution of the spotlight
 global_ambient = [0.4, 0.4, 0.4, 1.0] # global ambient lighting
@@ -14,9 +14,10 @@ global_ambient = [0.4, 0.4, 0.4, 1.0] # global ambient lighting
 def setup_lighting():
 
     glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0) 
-    #glEnable(GL_LIGHT1)
+    #glEnable(GL_LIGHT0) 
+    glEnable(GL_LIGHT1)
     glEnable(GL_NORMALIZE)
+    glShadeModel(GL_SMOOTH)
     
 
     # Set light parameters for sunlight
@@ -52,6 +53,9 @@ def setup_lighting():
     #spotDir = [dirX, dirY, dirZ]  # Direction of the spotlight
     spotlight_color = [1.0, 1.0, 1.0, 1.0]  # Color of the spotlight
     spotlight_cutoff = 40.0  # Angle (in degrees) within which the spotlight illuminates
+    light_diffuse = [1, 1, 1, 1.0]  # K diffuse reflection
+    light_specular = [1, 1, 1, 1.0]  # K Specular reflection
+    
 
     glLightfv(GL_LIGHT1, GL_DIFFUSE, spotlight_color)
     glLightfv(GL_LIGHT1, GL_SPECULAR, spotlight_color)
@@ -59,7 +63,8 @@ def setup_lighting():
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spotDir)
     glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spotlight_cutoff)
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, spotlight_exponent[0])
-
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse)
+    glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular)
     
     
 
