@@ -12,8 +12,8 @@ from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
 import webbrowser
-from tkinter import Tk, simpledialog
 
+from tkinter import Tk, simpledialog
 
 # golbals
 winW, winH = 500, 500
