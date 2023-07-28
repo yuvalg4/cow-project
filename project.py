@@ -11,6 +11,7 @@ from grass import draw_grass
 from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient
 from metallic import draw_metallic_object
+from rock import draw_rocks_and_sword
 
 # golbals
 winW, winH = 500, 500
@@ -23,6 +24,11 @@ angle_view_plane = 60
 eyeX, eyeY, eyeZ = 0, 20, -60
 refX, refY, refZ = 0, 0, 0
 upX, upY, upZ = 0, 1, 0
+aspect = float(winW) / winH
+
+curr_eyeX, curr_eyeY, curr_eyeZ = eyeX, eyeY, eyeZ
+curr_refX, curr_refY, curr_refZ = refX, refY, refZ
+curr_upX, curr_upY, curr_upZ = upX, upY, upZ
 
 head_angle_l_r = 0
 head_angle_u_d = 0
@@ -42,6 +48,8 @@ last_leg = "left"
 part_of_body = "body"
 
 x_fence = 4
+x_rock = -35
+z_rock = 0
 cow_len_z = 6
 
 def InitGlut():
@@ -66,6 +74,7 @@ def myDisplay():
 
     draw_grass()
     draw_fence(x_fence, 0, 0) 
+    draw_rocks_and_sword(x_rock,-2,z_rock)
 
     draw_lightpost()
     draw_metallic_object(-20, 20, 0, 10, 10, 10)
@@ -95,23 +104,24 @@ def show_text(text, xpos, ypos):
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(c))
 
 def reshape(width, height):
-    global winW, winH, projection_type
+    global winW, winH, aspect
     winW = width
     winH = height
+    aspect = float(winW) / winH
     glViewport(0, 0, width, height)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
 
-    aspect = float(width) / height
     gluPerspective(angle_view_plane, aspect, near_view_plane, far_view_plane)
-    gluLookAt(eyeX, eyeY, eyeZ, refX, refY, refZ, upX, upY, upZ)
-    
+    gluLookAt(curr_eyeX, curr_eyeY, curr_eyeZ, curr_refX, curr_refY, curr_refZ, curr_upX, curr_upY, curr_upZ)
+
     glMatrixMode(GL_MODELVIEW)
 
 
 def keyboard(key, x, y):
     global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
     global spotlight_exponent, global_ambient, part_of_body
+    global curr_eyeX, curr_eyeY, curr_eyeZ, curr_refX, curr_refY, curr_refZ, curr_upX, curr_upY, curr_upZ
     
     move(key)
 
@@ -154,6 +164,16 @@ def keyboard(key, x, y):
         global_ambient[0] -= 0.05 
         global_ambient[1] -= 0.05
         global_ambient[2] -= 0.05
+
+    # not working! need to fix
+    elif (key == b'c' or key == b'C'):
+        # cow eye parameters
+        curr_eyeX, curr_eyeY, curr_eyeZ = body_loc[0], (4/3)*cow_len_z, body_loc[1]-(4/3)*cow_len_z
+        curr_refX, curr_refY, curr_refZ = 0, (4/3)*cow_len_z, -60
+        curr_upX, curr_upY, curr_upZ = 0, 1, 0
+
+        gluPerspective(angle_view_plane, aspect, near_view_plane, far_view_plane)
+        gluLookAt(curr_eyeX, curr_eyeY, curr_eyeZ, curr_refX, curr_refY, curr_refZ, curr_upX, curr_upY, curr_upZ)
         
     else:
         return
