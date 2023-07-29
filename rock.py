@@ -18,7 +18,7 @@ def draw_rocks_and_sword(x,y,z):
     set_matte_properties()
     draw_rock(x+rock_base, y, z, (2/3)*rock_base, "rock2_texture.png")
     draw_rock(x-(4/5)*rock_base, y, z-(1/2)*rock_base, (3/4)*rock_base, "rock2_texture.png")
-    draw_rock(x, y, z+rock_base, (1/3)*rock_base, "rock2_texture.png")
+    draw_rock(x, y, z+(1/3)*rock_base, (1/3)*rock_base, "rock2_texture.png")
 
 
 def draw_rock(x, y, z, rock_base, texture_name):
