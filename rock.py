@@ -3,6 +3,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from utils import draw_item_texture, draw_item
 from texture import load_texture
+from light import set_matte_properties, set_shiny_properties
 
 ROCK_BASE = 7
 ROCK_GAP = 2
@@ -10,8 +11,11 @@ CORNER = 2
 
 def draw_rocks_and_sword(x,y,z):
     rock_base = 7
+    set_matte_properties()
     draw_rock(x, y, z, rock_base, "rock_texture.png")
+    set_shiny_properties()
     draw_sword(x+(1/2)*rock_base,y+rock_base,z-(1/2)*rock_base)
+    set_matte_properties()
     draw_rock(x+rock_base, y, z, (2/3)*rock_base, "rock2_texture.png")
     draw_rock(x-(4/5)*rock_base, y, z-(1/2)*rock_base, (3/4)*rock_base, "rock2_texture.png")
     draw_rock(x, y, z+rock_base, (1/3)*rock_base, "rock2_texture.png")
@@ -109,28 +113,9 @@ def draw_sword(x,y,z):
                ((4,5,6,7),0)]
     
 
-    # Material properties for metallic appearance
-    mat_ambient = [0.1, 0.1, 0.1, 1.0]   # Ambient color (r, g, b, a)
-    mat_diffuse = [0.5, 0.5, 0.5, 1.0]   # Diffuse color (r, g, b, a)
-    mat_specular = [0.9, 0.9, 0.9, 1.0]  # Specular color (r, g, b, a)
-    mat_shininess = 100.0
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient)
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse)
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular)
-    glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess)
 
     draw_item(vertices, indices, [(192/255,192/255,192/255)])
 
-    mat_ambient = [0.2, 0.2, 0.2, 1.0]   # Ambient color (r, g, b, a)
-    mat_diffuse = [0.8, 0.8, 0.8, 1.0]   # Diffuse color (r, g, b, a)
-    mat_specular = [0.0, 0.0, 0.0, 1.0]  # Specular color (r, g, b, a)
-    mat_shininess = 0.0
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient)
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse)
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular)
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess)
 
 
 

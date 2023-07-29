@@ -8,12 +8,27 @@ def draw_grass():
     grass_texture_id = load_texture("grass_texture.png")
     #glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glColor3f(1, 1, 1)
-    #glColor3f(1,1,1)
-    diffuseColorArray = [0.7, 0.7, 0.7, 1.0]
-    ambientColorArray = [0.7529, 0.7529, 0.7529, 1.0]
+    # diffuseColorArray = [1.0, 0.0, 0.0, 1.0]
+    # ambientColorArray = [0.7529, 0.7529, 0.7529, 1.0]
+    # glMaterial(GL_FRONT, GL_AMBIENT, ambientColorArray)
+    # glMaterial(GL_FRONT, GL_DIFFUSE, diffuseColorArray)
+    field_size = 100
+
+    ambientColorArray = [0.5, 0.5, 0.5, 1.0]
+    diffuseColorArray = [0.8, 0.8, 0.8, 1.0]
+    specularColorArray = [0.2, 0.2, 0.2, 1.0]
+    shininessValue = 10.0
+    
+
     glMaterial(GL_FRONT, GL_AMBIENT, ambientColorArray)
     glMaterial(GL_FRONT, GL_DIFFUSE, diffuseColorArray)
-    field_size = 100
+    glMaterial(GL_FRONT, GL_SPECULAR, specularColorArray)
+    glMaterial(GL_FRONT, GL_SHININESS, shininessValue)
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+
+
+
+
     texture_size = 2
     # v1 = (-1*field_size, 0, -1*field_size)
     # v2 = (field_size, 0, -1*field_size)
