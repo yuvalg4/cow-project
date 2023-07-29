@@ -9,7 +9,7 @@ from fence import draw_fence, NUM_PARTS, CHANGE
 from cow import cow
 from grass import draw_grass
 from light import setup_lighting, updateLight, draw_lightpost
-from light import spotLoc, spotDir, spotlight_exponent, global_ambient
+from light import spotLoc, spotDir, spotlight_exponent, global_ambient, set_matte_properties, set_shiny_properties
 from metallic import draw_metallic_object
 import webbrowser
 from rock import draw_rocks_and_sword
@@ -80,13 +80,16 @@ def myDisplay():
     global tail_angle_l_r, tail_angle_u_d, body_loc, body_move, x_fence, cow_len_z
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-
+    # glEnable(GL_COLOR_MATERIAL)
+    set_matte_properties()
     draw_grass()
     draw_fence(x_fence, 0, 0) 
+    # glDisable(GL_COLOR_MATERIAL)
+
     draw_rocks_and_sword(x_rock,-2,z_rock)
-
+    set_shiny_properties()
     draw_lightpost()
-
+    set_matte_properties()
     draw_metallic_object(-20, 30, 50, 10, 10, 10)
 
     x, z = body_loc

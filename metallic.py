@@ -15,7 +15,6 @@ def draw_metallic_object(center_x, center_y, center_z, len_x, len_y, len_z):
     # glMaterial(GL_FRONT, GL_DIFFUSE, diffuseColorArray)
     # glMaterial(GL_FRONT, GL_SPECULAR, specularColorArray)
     # glMaterial(GL_FRONT, GL_SHININESS, shininessValue)
-    # glMaterial(GL_FRONT, GL_DIFFUSE, diffuseColorArray)
     # glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
 
     glEnable(GL_TEXTURE_2D)

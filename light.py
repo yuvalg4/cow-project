@@ -14,7 +14,7 @@ global_ambient = [0.4, 0.4, 0.4, 1.0] # global ambient lighting
 def setup_lighting():
 
     glEnable(GL_LIGHTING)
-    #glEnable(GL_LIGHT0) 
+    glEnable(GL_LIGHT0) 
     glEnable(GL_LIGHT1)
     glEnable(GL_NORMALIZE)
     glShadeModel(GL_SMOOTH)
@@ -67,9 +67,10 @@ def setup_lighting():
     glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular)
     
     
-
+#
     glEnable(GL_COLOR_MATERIAL)
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+    # glColorMaterial(GL_FRONT, GL_SPECULAR)
     return
 
 def updateLight():
@@ -156,4 +157,27 @@ def draw_lightpost():
 
     glPopMatrix()
     glDisable(GL_BLEND)
+
+
+def set_matte_properties():
+    mat_ambient = [0.2, 0.2, 0.2, 1.0]   # Ambient color (r, g, b, a)
+    mat_diffuse = [0.8, 0.8, 0.8, 1.0]   # Diffuse color (r, g, b, a)
+    mat_specular = [0.0, 0.0, 0.0, 1.0]  # Specular color (r, g, b, a)
+    mat_shininess = 0.0                  # Shininess (0.0 for matte)
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient)
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse)
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular)
+    glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess) 
+
+def set_shiny_properties():
+    mat_ambient = [0.1, 0.1, 0.1, 1.0]   # Ambient color (r, g, b, a)
+    mat_diffuse = [0.5, 0.5, 0.5, 1.0]   # Diffuse color (r, g, b, a)
+    mat_specular = [0.9, 0.9, 0.9, 1.0]  # Specular color (r, g, b, a)
+    mat_shininess = 100.0                # Shininess (higher value for metallic)
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient)
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse)
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular)
+    glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess) 
     
