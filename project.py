@@ -142,6 +142,7 @@ def reshape(width, height):
     glMatrixMode(GL_MODELVIEW)
 
 def change_cow_eye_parameters():
+    # nead to add up and down movement
     global cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ, cow_upX, cow_upY, cow_upZ
     if 0 <= body_angle < 90:
         cow_eyeX = body_move[0] - math.sin(math.radians(body_angle))*(3/7)*cow_len_z
@@ -180,11 +181,6 @@ def change_cow_eye_parameters():
         cow_refX = cow_eyeX + cos_add*10
         cow_refZ = cow_eyeZ - sin_add*10
 
-    cow_eyeY += math.sin(math.radians(head_angle_u_d))*math.sqrt(2*math.pow((19/21)*cow_len_z,2))
-    cow_refY = cow_eyeY + math.sin(math.radians(head_angle_u_d))*math.sqrt(
-        2*math.pow(10+(19/21)*cow_len_z,2))
-
-    
 def keyboard(key, x, y):
     global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
     global spotlight_exponent, global_ambient, part_of_body
@@ -251,6 +247,7 @@ def keyboard(key, x, y):
         
     elif key == b'p' or key == b'P':
         point_of_view = "cow"
+        part_of_body = "body"
 
     reshape(winW, winH)
     glutPostRedisplay()
