@@ -13,7 +13,7 @@ def draw_item_texture(vertices, indices, texture_id, texture_size):
 def draw_quad_texture(v1, v2, v3, v4, texture_id, texture_size):
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, texture_id)
-
+    
     glColor3f(1,1,1)
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
@@ -25,6 +25,9 @@ def draw_quad_texture(v1, v2, v3, v4, texture_id, texture_size):
     glTexCoord2f(0.0, texture_size)
     glVertex3f(v4[0], v4[1], v4[2])
     glEnd()
+
+    
+    
 
     glDisable(GL_TEXTURE_2D)
 
@@ -44,6 +47,8 @@ def draw_triengle_texture(v1, v2, v3, texture_id, texture_size):
     glDisable(GL_TEXTURE_2D)
 
 def draw_item(vertices, indices, colors):
+    # glEnable(GL_COLOR_MATERIAL)
+    # glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
     for ind in indices:
         ver = ind[0]
         r, g, b = colors[ind[1]]
@@ -52,6 +57,7 @@ def draw_item(vertices, indices, colors):
             draw_quad(vertices[ver[0]], vertices[ver[1]], vertices[ver[2]], vertices[ver[3]])
         elif len(ver) == 3: # triengle
             draw_triengle(vertices[ver[0]], vertices[ver[1]], vertices[ver[2]])
+    # glDisable(GL_COLOR_MATERIAL)
 
 def draw_quad(v1, v2, v3, v4):
     glBegin(GL_QUADS)
