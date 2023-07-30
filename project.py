@@ -62,7 +62,6 @@ point_of_view = "camera"
 # cow eye parameters
 cow_eyeX, cow_eyeY, cow_eyeZ = 0, 2*cow_len_z, -(4/3)*cow_len_z
 cow_refX, cow_refY, cow_refZ = 0, 2*cow_len_z, -10
-cow_upX, cow_upY, cow_upZ = 0, 1, 0
 
 def InitGlut():
     posX, posY = 100, 100
@@ -136,50 +135,71 @@ def reshape(width, height):
         gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0)
     elif point_of_view == "cow":
         change_cow_eye_parameters()
-        cow_upX, cow_upY, cow_upZ = 0, 1, 0
-        gluLookAt(cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ, cow_upX, cow_upY, cow_upZ)
+        gluLookAt(cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ, 0, 1, 0)
 
     glMatrixMode(GL_MODELVIEW)
 
 def change_cow_eye_parameters():
-    # nead to add up and down movement
-    global cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ, cow_upX, cow_upY, cow_upZ
-    if 0 <= body_angle < 90:
-        cow_eyeX = body_move[0] - math.sin(math.radians(body_angle))*(3/7)*cow_len_z
-        cow_eyeZ = body_move[1] - math.cos(math.radians(body_angle))*(3/7)*cow_len_z 
-    elif 90 <= body_angle < 180:
-        cow_eyeX = body_move[0] - math.cos(math.radians(body_angle % 90))*(3/7)*(19/21)*cow_len_z
-        cow_eyeZ = body_move[1] + math.sin(math.radians(body_angle % 90))*(3/7)*cow_len_z
-    elif 180 <= body_angle < 270:
-        cow_eyeX = body_move[0] + math.sin(math.radians(body_angle % 90))*(3/7)*cow_len_z
-        cow_eyeZ = body_move[1] + math.cos(math.radians(body_angle % 90))*(3/7)*cow_len_z
-    elif 270 <= body_angle < 360:
-        cow_eyeX = body_move[0] + math.cos(math.radians(body_angle % 90))*(3/7)*cow_len_z
-        cow_eyeZ = body_move[1] - math.sin(math.radians(body_angle % 90))*(3/7)*cow_len_z
+    global cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ
+
+    matrix_neck = translation_matrix(body_move[0],(4/3)*cow_len_z,body_move[1]) @ rotation_matrix_y(
+        np.radians(body_angle)) @ translation_matrix(0,-(4/3)*cow_len_z,0)
     
-    eye_angle = (body_angle+head_angle_l_r)%360
-    sin_add = math.sin(math.radians(eye_angle%90))
-    cos_add = math.cos(math.radians(eye_angle%90))
-    if 0 <= eye_angle < 90:
-        cow_eyeX -= sin_add*(19/21)*cow_len_z
-        cow_eyeZ -= cos_add*(19/21)*cow_len_z
-        cow_refX = cow_eyeX - sin_add*10
-        cow_refZ = cow_eyeZ - cos_add*10
-    elif 90 <= eye_angle < 180:
-        cow_eyeX -= cos_add*(19/21)*cow_len_z
-        cow_eyeZ += sin_add*(19/21)*cow_len_z
-        cow_refX = cow_eyeX - cos_add*10
-        cow_refZ = cow_eyeZ + sin_add*10
-    elif 180 <= eye_angle < 270:
-        cow_eyeX += sin_add*(19/21)*cow_len_z
-        cow_eyeZ += cos_add*(19/21)*cow_len_z
-        cow_refX = cow_eyeX + sin_add*10
-        cow_refZ = cow_eyeZ + cos_add*10
-    elif 270 <= eye_angle < 360:
-        cow_eyeX += cos_add*(19/21)*cow_len_z
-        cow_eyeZ -= sin_add*(19/21)*cow_len_z
-        cow_refX = cow_eyeX + cos_add*10
-        cow_refZ = cow_eyeZ - sin_add*10
+    neck_homogenic =  np.array([0, (14/9)*cow_len_z,-(3/7)*cow_len_z, 1])
+    neck_homogenic = matrix_neck @ neck_homogenic
+    neck_x = neck_homogenic[0]/neck_homogenic[3]
+    neck_y = neck_homogenic[1]/neck_homogenic[3]
+    neck_z = neck_homogenic[2]/neck_homogenic[3]
+
+    cow_eye_homogenic = np.array([0, 2*cow_len_z, -(4/3)*cow_len_z, 1])
+    cow_eye_homogenic = matrix_neck @ cow_eye_homogenic
+    cow_eyeX = cow_eye_homogenic[0]/cow_eye_homogenic[3]
+    cow_eyeY = cow_eye_homogenic[1]/cow_eye_homogenic[3]
+    cow_eyeZ = cow_eye_homogenic[2]/cow_eye_homogenic[3]
+
+    cow_ref_homogenic = np.array([0, 2*cow_len_z, -10, 1])
+    cow_ref_homogenic = matrix_neck @ cow_ref_homogenic
+    cow_refX = cow_ref_homogenic[0]/cow_ref_homogenic[3]
+    cow_refY = cow_ref_homogenic[1]/cow_ref_homogenic[3]
+    cow_refZ = cow_ref_homogenic[2]/cow_ref_homogenic[3]
+
+    matrix = translation_matrix(neck_x,neck_y,neck_z) @ rotation_matrix_y(
+        np.radians(head_angle_l_r + body_angle)) @ rotation_matrix_x(np.radians(head_angle_u_d)) @ rotation_matrix_y(
+        np.radians(-body_angle)) @ translation_matrix(-neck_x,-neck_y,-neck_z)
+
+    cow_eye_homogenic = np.array([cow_eyeX, cow_eyeY, cow_eyeZ, 1])
+    cow_eye_homogenic = matrix @ cow_eye_homogenic
+    cow_eyeX = cow_eye_homogenic[0]/cow_eye_homogenic[3]
+    cow_eyeY = cow_eye_homogenic[1]/cow_eye_homogenic[3]
+    cow_eyeZ = cow_eye_homogenic[2]/cow_eye_homogenic[3]
+
+    cow_ref_homogenic = np.array([cow_refX, cow_refY, cow_refZ, 1])
+    cow_ref_homogenic = matrix @ cow_ref_homogenic
+    cow_refX = cow_ref_homogenic[0]/cow_ref_homogenic[3]
+    cow_refY = cow_ref_homogenic[1]/cow_ref_homogenic[3]
+    cow_refZ = cow_ref_homogenic[2]/cow_ref_homogenic[3]
+
+def translation_matrix(tx, ty, tz):
+    return np.array([[1, 0, 0, tx],
+                     [0, 1, 0, ty],
+                     [0, 0, 1, tz],
+                     [0, 0, 0, 1]])
+
+def rotation_matrix_x(theta):
+    c = np.cos(theta)
+    s = np.sin(theta)
+    return np.array([[1, 0, 0, 0],
+                     [0, c, -s, 0],
+                     [0, s, c, 0],
+                     [0, 0, 0, 1]])
+
+def rotation_matrix_y(theta):
+    c = np.cos(theta)
+    s = np.sin(theta)
+    return np.array([[c, 0, s, 0],
+                     [0, 1, 0, 0],
+                     [-s, 0, c, 0],
+                     [0, 0, 0, 1]])
 
 def keyboard(key, x, y):
     global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
@@ -438,6 +458,8 @@ def move(key):
 
         elif key == b'-' and radius < RADIUS_CAM_MAX:
             change = 5
+        else: # got to the bound of radius (mininum or maximum)
+            change = 0
         
         eyeX = eyeX*((radius+change)/radius)
         eyeZ = eyeZ*((radius+change)/radius)
@@ -473,8 +495,6 @@ def ProcessAmbientMenu(value):
             #print(f'user input is: ',user_input)
             global_ambient[0] = float(user_input)
             #print("updated ambient R")
-            
-
 
     elif value == 2:
         #print("starting ambient G setting")
