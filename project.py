@@ -2,7 +2,6 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from PIL import Image
 import numpy as np
 import math
 from fence import draw_fence, NUM_PARTS, CHANGE

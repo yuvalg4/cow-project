@@ -50,3 +50,7 @@ spotLoc = [-16, 20, -20, 1]  # Position of the spotlight
 spotDir = [-5, -5 , 5]  # Direction of the spotlight
 spotlight_exponent = [20.0]  # Exponent that controls the intensity distribution of the spotlight
 global_ambient = [0.4, 0.4, 0.4, 1.0] # global ambient lighting
+
+#Fence parameters
+NUM_PARTS = 20
+CHANGE = 2

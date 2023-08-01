@@ -3,9 +3,9 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from utils import draw_item_texture
 from texture import load_texture
+from globals import NUM_PARTS, CHANGE
 
-NUM_PARTS = 20
-CHANGE = 2
+
 
 # A looping function that draws 20 fence pickets.
 def draw_fence(x, y, z):
