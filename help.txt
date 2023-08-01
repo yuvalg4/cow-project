@@ -1,1 +1,60 @@
-test txt file
+Hello and welcome to Cow World!
+Here is a quick guide on how to interact with our world.
+You can always open it up again by right clicking anywhere on your screen and selecting the "Help" on the popup menu.
+first, lets start with the basic controls. In order to toggle between different functions you will need to click the key associated with that function.
+(don't worry they are not case sensative!)
+
+-Right mouse click anywhere on the screen - Opens up the menu
+    - Exit Button
+    - Help Button
+    - Ambient light controls
+    
+"B" - Cow body movement
+    "J" - Move left
+    "I" - Turn forward
+    "L" - Turn right
+    "K" - Move back
+
+"H" - Head movement
+    "J" - Turn left
+    "I" - Turn forward
+    "L" - Turn right
+    "K" - Turn back
+
+"T" - Tail movement
+    "J" - Swing left
+    "I" - Swing up
+    "L" - Swing right
+    "K" - Swing down
+
+"F" - Leg Movement independant of the body.
+    "J" - Move left
+    "I" - Move forward
+    "L" - Move right
+    "K" - Move back
+
+"C" - Camera movement, and toggle back to the main camera.
+    "J" - Pivot left
+    "I" - Pivot up
+    "L" - Pivot right
+    "K" - Pivot down
+    "+" - Zoom in
+    "-" - Zoom out
+
+"P" - Toggle to the cow's point of view. Enables body controls.
+     -This will automatically toggle to body movement.
+     -You can click all other control keys and move controls will work.
+     -We suggest to click "H" and look around.
+
+"s" - Spotlight control
+    "J" - Move left
+    "I" - Move up
+    "L" - Move right
+    "K" - Move down
+    "[" - Widen the spread of the spotlight
+    "]" - Narrow the spread of the spotlight
+    "," - Make lamp post higher.
+    "." - Make lamp post lower.
+    "0" - Increase the general ambient light intensity
+    "9" - Lower the general ambient light intensity
+

@@ -4,7 +4,7 @@ from OpenGL.GLUT import *
 from utils import draw_quad_texture, draw_item_texture
 from texture import load_texture
 
-def draw_grass():
+def draw_grass(centerX,centerZ):
     grass_texture_id = load_texture("grass_texture.png")
     #glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glColor3f(1, 1, 1)
@@ -12,7 +12,7 @@ def draw_grass():
     # ambientColorArray = [0.7529, 0.7529, 0.7529, 1.0]
     # glMaterial(GL_FRONT, GL_AMBIENT, ambientColorArray)
     # glMaterial(GL_FRONT, GL_DIFFUSE, diffuseColorArray)
-    field_size = 100
+   
 
     ambientColorArray = [0.5, 0.5, 0.5, 1.0]
     diffuseColorArray = [0.8, 0.8, 0.8, 1.0]
@@ -37,17 +37,18 @@ def draw_grass():
     #draw_quad_texture(v1, v2, v3, v4, grass_texture_id, texture_size)
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, grass_texture_id)
-    gridSize = 5
+    field_size = 500
+    gridSize = 13
     cellSize = field_size / gridSize
-    groundHeight = -1.0
+    groundHeight = 0.0
 
     for x in range(gridSize):
         for z in range(gridSize):
             glBegin(GL_QUADS)
             
 
-            x0 = -field_size / 2.0 + x * cellSize
-            z0 = -field_size / 2.0 + z * cellSize
+            x0 = (centerX-field_size) / 2.0 + x * cellSize
+            z0 = (centerZ-field_size) / 2.0 + z * cellSize
             glTexCoord2f(0.0, 0.0)  
             glVertex3f(x0, groundHeight, z0)
             glTexCoord2f(texture_size, 0.0)
@@ -61,4 +62,5 @@ def draw_grass():
             glVertex3f(x0, groundHeight, z0 + cellSize)
 
             glEnd()
+
     glDisable(GL_TEXTURE_2D)

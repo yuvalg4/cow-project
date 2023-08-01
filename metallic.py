@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from texture import load_texture
 
-def draw_metallic_object(center_x, center_y, center_z, len_x, len_y, len_z):
+def draw_metallic_object(center_x, center_y, center_z):
     sun_texture_id = load_texture("sun.png")
     ambientColorArray = [1, 1, 1, 1.0]
     diffuseColorArray = [0.1, 0.1, 0.1, 1.0]
