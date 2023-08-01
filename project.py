@@ -53,7 +53,7 @@ part_of_body = "body"
 
 # eye parameters
 near_view_plane = 0.1
-far_view_plane = 100
+far_view_plane = 150
 angle_view_plane = 60
 eyeX, eyeY, eyeZ = 0, 20, -60
 radius = abs(eyeZ)
@@ -89,7 +89,11 @@ def myDisplay():
 
     # glEnable(GL_COLOR_MATERIAL)
     set_matte_properties()
-    draw_grass()
+    if point_of_view == 'camera':
+        draw_grass(eyeX, eyeZ)
+    else:
+        draw_grass(body_loc[0], body_loc[1])
+
     draw_fence(x_fence, 0, 0) 
     # glDisable(GL_COLOR_MATERIAL)
 
@@ -97,7 +101,7 @@ def myDisplay():
     set_shiny_properties()
     draw_lightpost()
     set_matte_properties()
-    draw_metallic_object(-20, 30, 50, 10, 10, 10)
+    draw_metallic_object(-20, 50, 80)
 
     x, z = body_loc
     y = (4/3)*cow_len_z
@@ -210,57 +214,17 @@ def keyboard(key, x, y):
     
     move(key)
 
-    if (key == b'g' or key == b'G') and spotLoc[0] > -1000:  # spotlight forward
-        spotLoc[2] -= 1
-        updateLight()
-        #print("T clicked")
+    if (key == b's' or key == b'S'):  
+        part_of_body = "spotlight"
 
-    elif (key == b't' or key == b'T' ) and spotLoc[0] < 1000: # spotlight backward
+    elif (key == b't' or key == b'T' ): 
         part_of_body = "tail"
-        spotLoc[2] += 1
-        updateLight()
 
-    elif (key == b'f' or key == b'F') and spotLoc[0] > -1000 and spotLoc[0] > -1000:  # spotlight right    
-        spotLoc[0] += 1
-        updateLight()
-        #print("H clicked")
-
-    elif (key == b'h' or key == b'H' ):  # spotlight left
-        part_of_body = "head"
-        spotLoc[0] -= 1
-        updateLight()
-        #print("F clicked")
-
-    elif (key == b'v' or key == b'V') and spotLoc[1] < 120: # spotlight higher
-        spotLoc[1] += 1
-        updateLight()
-
-
-    elif (key == b'B' or key == b'b') and spotLoc[1] > 0: # spotlight lower
+    elif (key == b'b' or key == b'B' ): 
         part_of_body = "body"
-
-        spotLoc[1] -= 1
-        updateLight()
-
-    elif (key == b']') and spotlight_exponent[0] < 125: # spotlight stonger
-        spotlight_exponent[0] += 5
-        updateLight()
-
-    elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
-        spotlight_exponent[0] -= 5
-        updateLight()
-
-    elif(key == b'0') and global_ambient[0] < 1.0:
-        global_ambient[0] += 0.05 
-        global_ambient[1] += 0.05
-        global_ambient[2] += 0.05
-        updateLight()
-
-    elif(key == b'9') and global_ambient[0] > 0.0:
-        global_ambient[0] -= 0.05 
-        global_ambient[1] -= 0.05
-        global_ambient[2] -= 0.05
-        updateLight()
+    
+    elif (key == b'h' or key == b'H' ): 
+        part_of_body = "head"
 
     elif (key == b'c' or key == b'C'):
         part_of_body = "camera"
@@ -287,7 +251,11 @@ def move(key):
     bounds_z_down = (-1*CHANGE*NUM_PARTS + (2/3)*cow_len_z, -1*CHANGE*NUM_PARTS - (2/3)*cow_len_z)
 
     if (key == b'j' or key == b'J'):
-        if part_of_body == "body":
+        if part_of_body == "spotlight" :  # spotlight right    
+            spotLoc[0] += 1
+            updateLight()
+
+        elif part_of_body == "body":
             body_angle += 5
             if body_angle >= 360:
                 body_angle -= 360
@@ -322,7 +290,12 @@ def move(key):
                 eyeZ = -eyeZ
             
     elif (key == b'l' or key == b'L'):
-        if part_of_body == "body":
+        if part_of_body == "spotlight":
+            spotLoc[0] -= 1
+            updateLight()
+            #print("F clicked")
+
+        elif part_of_body == "body":
             body_angle -= 5
             if body_angle < 0:
                 body_angle += 360
@@ -357,7 +330,10 @@ def move(key):
                 eyeZ = -eyeZ
 
     elif (key == b'i' or key == b'I'):
-        if part_of_body == "body":
+        if part_of_body == "spotlight":
+            spotLoc[2] += 1
+            updateLight()
+        elif part_of_body == "body":
             x, z = body_loc
 
             if 0 <= body_angle < 90:
@@ -406,7 +382,12 @@ def move(key):
                 eyeY += 5
 
     elif (key == b'k' or key == b'K'):
-        if part_of_body == "body":
+
+        if part_of_body == "spotlight":
+            spotLoc[2] -= 1
+            updateLight()
+
+        elif part_of_body == "body":
             x, z = body_loc
 
             if 0 <= body_angle < 90:
@@ -465,6 +446,34 @@ def move(key):
         eyeX = eyeX*((radius+change)/radius)
         eyeZ = eyeZ*((radius+change)/radius)
         radius += change
+
+    elif (part_of_body == "spotlight"):
+        if key == b'.':
+            spotLoc[1] += 1
+            updateLight()
+        elif key == b',' and spotLoc > 0:
+            spotLoc[1] -= 1
+            updateLight()
+
+        elif (key == b']') and spotlight_exponent[0] < 120: # spotlight stonger
+            spotlight_exponent[0] += 5
+            updateLight()
+
+        elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
+            spotlight_exponent[0] -= 5
+            updateLight() 
+
+        elif(key == b'0') and (global_ambient[0] < 1.0 and global_ambient[1] < 1.0 and global_ambient[2] < 1.0):
+            global_ambient[0] += 0.05 
+            global_ambient[1] += 0.05
+            global_ambient[2] += 0.05
+            updateLight()
+
+        elif(key == b'9') and (global_ambient[0] > 0.0 and global_ambient[1] > 0.0 and global_ambient[2] > 0.0):
+            global_ambient[0] -= 0.05 
+            global_ambient[1] -= 0.05
+            global_ambient[2] -= 0.05
+            updateLight()
 
 #### Callbacks ####
 def RegisterCallbacks():
@@ -535,7 +544,7 @@ def ProcessMenu(value):
         glutLeaveMainLoop()
 
     if value == 2:
-        webbrowser.open("help.txt")
+        webbrowser.open("Hello and welcome to Cow World.pdf")
        
     return 1
 
@@ -544,9 +553,9 @@ def createMainMenu():
     ambientMenu = glutCreateMenu(ProcessAmbientMenu)
     createAmbientMenu()
     glutCreateMenu(ProcessMenu)
-    glutAddMenuEntry("Exit", 1)
     glutAddMenuEntry("Help", 2)
     glutAddSubMenu("Adjust Ambient Light", ambientMenu)
+    glutAddMenuEntry("Exit", 1)
     glutAttachMenu(GLUT_RIGHT_BUTTON)
 
 
@@ -554,6 +563,7 @@ def main():
     InitGlut()
     init()
     RegisterCallbacks()
+    webbrowser.open("Welcome.txt")
     glutMainLoop()
 
 if __name__ == '__main__':
