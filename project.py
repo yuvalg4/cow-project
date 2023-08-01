@@ -10,11 +10,12 @@ from cow import cow
 from grass import draw_grass
 from light import setup_lighting, updateLight, draw_lightpost
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient, set_matte_properties, set_shiny_properties
-from metallic import draw_metallic_object
+from sun import draw_sun
 import webbrowser
 from rock import draw_rocks_and_sword
+from menu import createMainMenu
 
-from tkinter import Tk, simpledialog
+
 
 
 RADIUS_CAM_MIN = 30
@@ -101,7 +102,7 @@ def myDisplay():
     set_shiny_properties()
     draw_lightpost()
     set_matte_properties()
-    draw_metallic_object(-20, 50, 80)
+    draw_sun(-20, 50, 80)
 
     x, z = body_loc
     y = (4/3)*cow_len_z
@@ -483,80 +484,18 @@ def RegisterCallbacks():
     glutReshapeFunc(reshape)
 
 
-def popUpInput(winTitle, winPrompt):
-    root = Tk()
-    root.withdraw()
-    userInput = -1
-    while userInput != None:
-        userInput = simpledialog.askfloat(title=winTitle, prompt=winPrompt)
-        if userInput != None and userInput >= 0 and userInput <= 1:
-            root.destroy()
-            return userInput
-    
-    root.destroy()
-    return userInput
-
-def ProcessAmbientMenu(value):
-    global global_ambient
-    if value == 1 :
-        #print("starting ambient R setting")
-        user_input = popUpInput("Red Value Setting", "Input Ambient R Value")
-        if user_input != None:
-            #print(f'user input is: ',user_input)
-            global_ambient[0] = float(user_input)
-            #print("updated ambient R")
-
-    elif value == 2:
-        #print("starting ambient G setting")
-        user_input = popUpInput("Green Value Setting", "Input Ambient G Value")
-        if user_input != None:
-            #print(f'user input is: ',user_input)
-            global_ambient[1] = float(user_input)
-            #print("updated ambient G")
-
-    elif value == 3:
-        #print("starting ambient B setting")
-        user_input = popUpInput("Blue Value Setting", "Input Ambient B Value")
-        if user_input != None:
-            #print(f'user input is: ',user_input)
-            global_ambient[2] = float(user_input)
-            #print("updated ambient B")
-    
-    elif value == 4:
-        global_ambient[0], global_ambient[1], global_ambient[2] = 0.4, 0.4, 0.4 
-       
-    # print(f'ambient R is: ', global_ambient[0])
-    # print(f'ambient G is: ', global_ambient[1])
-    # print(f'ambient B is: ', global_ambient[2])
-    updateLight()
-    return 1
 
 
-def createAmbientMenu():
-    glutAddMenuEntry("Set Red Ambient Value", 1)
-    glutAddMenuEntry("Set Green Ambient Value", 2)
-    glutAddMenuEntry("Set Blue Ambient Value", 3)
-    glutAddMenuEntry("Reset To Default", 4)
 
 
-def ProcessMenu(value):
-    if value == 1 :
-        glutLeaveMainLoop()
-
-    if value == 2:
-        webbrowser.open("Hello and welcome to Cow World.pdf")
-       
-    return 1
 
 
-def createMainMenu():
-    ambientMenu = glutCreateMenu(ProcessAmbientMenu)
-    createAmbientMenu()
-    glutCreateMenu(ProcessMenu)
-    glutAddMenuEntry("Help", 2)
-    glutAddSubMenu("Adjust Ambient Light", ambientMenu)
-    glutAddMenuEntry("Exit", 1)
-    glutAttachMenu(GLUT_RIGHT_BUTTON)
+
+
+
+
+
+
 
 
 def main():
