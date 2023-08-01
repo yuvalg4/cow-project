@@ -16,22 +16,23 @@ from rock import draw_rocks_and_sword
 
 from tkinter import Tk, simpledialog
 
-# golbals
+
+RADIUS_CAM_MIN = 30
+RADIUS_CAM_MAX = 100
+HIGTH_CAM_MIN = 10
+HIGTH_CAM_MAX = 60
+
+# window
 winW, winH = 500, 500
 angle = 0
-
-# eye parameters
-near_view_plane = 0.1
-far_view_plane = 100
-angle_view_plane = 60
-eyeX, eyeY, eyeZ = 0, 20, -60
-refX, refY, refZ = 0, 0, 0
-upX, upY, upZ = 0, 1, 0
 aspect = float(winW) / winH
 
-curr_eyeX, curr_eyeY, curr_eyeZ = eyeX, eyeY, eyeZ
-curr_refX, curr_refY, curr_refZ = refX, refY, refZ
-curr_upX, curr_upY, curr_upZ = upX, upY, upZ
+# locations, size, angles
+x_fence = 4
+x_rock = -35
+z_rock = 0
+cow_len_z = 6
+aspect = float(winW) / winH
 
 head_angle_l_r = 0
 head_angle_u_d = 0
@@ -50,10 +51,18 @@ last_leg = "left"
 
 part_of_body = "body"
 
-x_fence = 4
-x_rock = -35
-z_rock = 0
-cow_len_z = 6
+# eye parameters
+near_view_plane = 0.1
+far_view_plane = 100
+angle_view_plane = 60
+eyeX, eyeY, eyeZ = 0, 20, -60
+radius = abs(eyeZ)
+camera_movement = "up"
+point_of_view = "camera"
+
+# cow eye parameters
+cow_eyeX, cow_eyeY, cow_eyeZ = 0, 2*cow_len_z, -(4/3)*cow_len_z
+cow_refX, cow_refY, cow_refZ = 0, 2*cow_len_z, -10
 
 def InitGlut():
     posX, posY = 100, 100
@@ -73,8 +82,6 @@ def init():
     glEnable(GL_DEPTH_TEST)
     glLoadIdentity()
      
-
-
 def myDisplay():
     global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle, right_legs_angle
     global tail_angle_l_r, tail_angle_u_d, body_loc, body_move, x_fence, cow_len_z
@@ -125,15 +132,81 @@ def reshape(width, height):
     glLoadIdentity()
 
     gluPerspective(angle_view_plane, aspect, near_view_plane, far_view_plane)
-    gluLookAt(curr_eyeX, curr_eyeY, curr_eyeZ, curr_refX, curr_refY, curr_refZ, curr_upX, curr_upY, curr_upZ)
+    if point_of_view == "camera":
+        gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0)
+    elif point_of_view == "cow":
+        change_cow_eye_parameters()
+        gluLookAt(cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ, 0, 1, 0)
 
     glMatrixMode(GL_MODELVIEW)
 
+def change_cow_eye_parameters():
+    global cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ
+
+    matrix_neck = translation_matrix(body_move[0],(4/3)*cow_len_z,body_move[1]) @ rotation_matrix_y(
+        np.radians(body_angle)) @ translation_matrix(0,-(4/3)*cow_len_z,0)
+    
+    neck_homogenic =  np.array([0, (14/9)*cow_len_z,-(3/7)*cow_len_z, 1])
+    neck_homogenic = matrix_neck @ neck_homogenic
+    neck_x = neck_homogenic[0]/neck_homogenic[3]
+    neck_y = neck_homogenic[1]/neck_homogenic[3]
+    neck_z = neck_homogenic[2]/neck_homogenic[3]
+
+    cow_eye_homogenic = np.array([0, 2*cow_len_z, -(4/3)*cow_len_z, 1])
+    cow_eye_homogenic = matrix_neck @ cow_eye_homogenic
+    cow_eyeX = cow_eye_homogenic[0]/cow_eye_homogenic[3]
+    cow_eyeY = cow_eye_homogenic[1]/cow_eye_homogenic[3]
+    cow_eyeZ = cow_eye_homogenic[2]/cow_eye_homogenic[3]
+
+    cow_ref_homogenic = np.array([0, 2*cow_len_z, -10, 1])
+    cow_ref_homogenic = matrix_neck @ cow_ref_homogenic
+    cow_refX = cow_ref_homogenic[0]/cow_ref_homogenic[3]
+    cow_refY = cow_ref_homogenic[1]/cow_ref_homogenic[3]
+    cow_refZ = cow_ref_homogenic[2]/cow_ref_homogenic[3]
+
+    matrix = translation_matrix(neck_x,neck_y,neck_z) @ rotation_matrix_y(
+        np.radians(head_angle_l_r + body_angle)) @ rotation_matrix_x(np.radians(head_angle_u_d)) @ rotation_matrix_y(
+        np.radians(-body_angle)) @ translation_matrix(-neck_x,-neck_y,-neck_z)
+
+    cow_eye_homogenic = np.array([cow_eyeX, cow_eyeY, cow_eyeZ, 1])
+    cow_eye_homogenic = matrix @ cow_eye_homogenic
+    cow_eyeX = cow_eye_homogenic[0]/cow_eye_homogenic[3]
+    cow_eyeY = cow_eye_homogenic[1]/cow_eye_homogenic[3]
+    cow_eyeZ = cow_eye_homogenic[2]/cow_eye_homogenic[3]
+
+    cow_ref_homogenic = np.array([cow_refX, cow_refY, cow_refZ, 1])
+    cow_ref_homogenic = matrix @ cow_ref_homogenic
+    cow_refX = cow_ref_homogenic[0]/cow_ref_homogenic[3]
+    cow_refY = cow_ref_homogenic[1]/cow_ref_homogenic[3]
+    cow_refZ = cow_ref_homogenic[2]/cow_ref_homogenic[3]
+
+def translation_matrix(tx, ty, tz):
+    return np.array([[1, 0, 0, tx],
+                     [0, 1, 0, ty],
+                     [0, 0, 1, tz],
+                     [0, 0, 0, 1]])
+
+def rotation_matrix_x(theta):
+    c = np.cos(theta)
+    s = np.sin(theta)
+    return np.array([[1, 0, 0, 0],
+                     [0, c, -s, 0],
+                     [0, s, c, 0],
+                     [0, 0, 0, 1]])
+
+def rotation_matrix_y(theta):
+    c = np.cos(theta)
+    s = np.sin(theta)
+    return np.array([[c, 0, s, 0],
+                     [0, 1, 0, 0],
+                     [-s, 0, c, 0],
+                     [0, 0, 0, 1]])
 
 def keyboard(key, x, y):
     global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
     global spotlight_exponent, global_ambient, part_of_body
-    global curr_eyeX, curr_eyeY, curr_eyeZ, curr_refX, curr_refY, curr_refZ, curr_upX, curr_upY, curr_upZ
+    global cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ
+    global eyeX, eyeY, eyeZ, point_of_view
     
     move(key)
 
@@ -189,26 +262,21 @@ def keyboard(key, x, y):
         global_ambient[2] -= 0.05
         updateLight()
 
-
-    # not working! need to fix
     elif (key == b'c' or key == b'C'):
-        # cow eye parameters
-        curr_eyeX, curr_eyeY, curr_eyeZ = body_loc[0], (4/3)*cow_len_z, body_loc[1]-(4/3)*cow_len_z
-        curr_refX, curr_refY, curr_refZ = 0, (4/3)*cow_len_z, -60
-        curr_upX, curr_upY, curr_upZ = 0, 1, 0
-
-        gluPerspective(angle_view_plane, aspect, near_view_plane, far_view_plane)
-        gluLookAt(curr_eyeX, curr_eyeY, curr_eyeZ, curr_refX, curr_refY, curr_refZ, curr_upX, curr_upY, curr_upZ)
+        part_of_body = "camera"
+        point_of_view = "camera"
         
-    else:
-        return
-    
+    elif key == b'p' or key == b'P':
+        point_of_view = "cow"
+        part_of_body = "body"
+
     reshape(winW, winH)
     glutPostRedisplay()
 
 def move(key):
     global head_angle_l_r, head_angle_u_d, head_up_vector, part_of_body, body_loc, body_move, last_leg
     global tail_angle_l_r, tail_angle_u_d, body_angle, left_legs_angle, right_legs_angle, x_fence, cow_len_z
+    global eyeX, eyeY, eyeZ, radius, camera_movement
 
     # Explanation of cheking in body movement:
     # fence from (x_fence,0,0) to (x_fence + CHANGE*NUM_PARTS,0,0)
@@ -229,7 +297,30 @@ def move(key):
 
         elif part_of_body == "tail" and tail_angle_l_r > -25:
             tail_angle_l_r -= 5
-        
+
+        elif part_of_body == "camera":
+            if eyeX == radius:
+                eyeX -= 5
+                camera_movement = "down"
+
+            elif -eyeX == radius:
+                eyeX += 5
+                camera_movement = "up"
+
+            elif camera_movement == "up":
+                eyeX += 5
+                if eyeX > radius:
+                    eyeX = radius
+            
+            elif camera_movement == "down":
+                eyeX -= 5
+                if eyeX < -radius:
+                    eyeX = -radius
+                
+            eyeZ = math.sqrt(math.pow(radius,2)-math.pow(eyeX,2))
+            if camera_movement == "up":
+                eyeZ = -eyeZ
+            
     elif (key == b'l' or key == b'L'):
         if part_of_body == "body":
             body_angle -= 5
@@ -241,6 +332,29 @@ def move(key):
 
         elif part_of_body == "tail" and tail_angle_l_r < 25:
             tail_angle_l_r += 5
+
+        elif part_of_body == "camera":
+            if eyeX == radius:
+                eyeX -= 5
+                camera_movement = "up"
+
+            elif -eyeX == radius:
+                eyeX += 5
+                camera_movement = "down"
+
+            elif camera_movement == "up":
+                eyeX -= 5
+                if eyeX < -radius:
+                    eyeX = -radius
+            
+            elif camera_movement == "down":
+                eyeX += 5
+                if eyeX > radius:
+                    eyeX = radius
+
+            eyeZ = math.sqrt(math.pow(radius,2)-math.pow(eyeX,2))
+            if camera_movement == "up":
+                eyeZ = -eyeZ
 
     elif (key == b'i' or key == b'I'):
         if part_of_body == "body":
@@ -262,6 +376,7 @@ def move(key):
                 alpha = math.radians(body_angle - 270)
                 body_move = (x + 5*math.cos(alpha),z - 5*math.sin(alpha))
 
+            # fence bounds
             if ((z < bounds_z_up[0] <= body_move[1] or body_move[1] < bounds_z_up[1] <= z) and 
                 x_fence + CHANGE*NUM_PARTS > x > x_fence) or (
                 (x < bounds_x[0] <= body_move[0] or body_move[0] < bounds_x[1] <= x) and
@@ -285,6 +400,10 @@ def move(key):
 
         elif part_of_body == "tail" and tail_angle_u_d > -50:
             tail_angle_u_d -= 5
+
+        elif part_of_body == "camera":
+            if eyeY < HIGTH_CAM_MAX:
+                eyeY += 5
 
     elif (key == b'k' or key == b'K'):
         if part_of_body == "body":
@@ -330,6 +449,23 @@ def move(key):
         elif part_of_body == "tail" and tail_angle_u_d < 0:
             tail_angle_u_d += 5
 
+        elif part_of_body == "camera":
+            if eyeY > HIGTH_CAM_MIN:
+                eyeY -= 5
+
+    elif part_of_body == "camera" and (key == b'+' or key == b'-'):
+        if key == b'+' and radius > RADIUS_CAM_MIN:
+            change = -5
+
+        elif key == b'-' and radius < RADIUS_CAM_MAX:
+            change = 5
+        else: # got to the bound of radius (mininum or maximum)
+            change = 0
+        
+        eyeX = eyeX*((radius+change)/radius)
+        eyeZ = eyeZ*((radius+change)/radius)
+        radius += change
+
 #### Callbacks ####
 def RegisterCallbacks():
     glutDisplayFunc(myDisplay)
@@ -360,8 +496,6 @@ def ProcessAmbientMenu(value):
             #print(f'user input is: ',user_input)
             global_ambient[0] = float(user_input)
             #print("updated ambient R")
-            
-
 
     elif value == 2:
         #print("starting ambient G setting")

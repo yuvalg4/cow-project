@@ -17,7 +17,12 @@ def cow(center_x, center_z, len_z, head_angle_display_r, head_angle_display_u,
     head_x = center_x
     head_y = center_y + (1/3)*len_y
     head_z = center_z - (3/7)*len_z
-    draw_head(head_x, head_y, head_z, len_x, head_angle_display_r, head_angle_display_u)
+
+    neck_x = len_x/3
+    neck_y = len_x/2
+    neck_z = len_x
+
+    draw_head(head_x, head_y, head_z, neck_x, neck_y, neck_z, head_angle_display_r, head_angle_display_u)
     # legs
     draw_tail(center_x, center_y, center_z + (7/8)*len_z, len_x, 
               tail_angle_display_r, tail_angle_display_u)
@@ -94,10 +99,7 @@ def textured_body(center_x, center_y, center_z, len_x, len_y, len_z):
     glBindTexture(GL_TEXTURE_2D, 0)
     glDisable(GL_TEXTURE_2D)
 
-def draw_head(x, y, z, body_len_x, head_angle_display_r, head_angle_display_u): # (x,y,z) point inside body
-    neck_x = body_len_x/3
-    neck_y = body_len_x/2
-    neck_z = body_len_x
+def draw_head(x, y, z, neck_x, neck_y, neck_z, head_angle_display_r, head_angle_display_u): # (x,y,z) point inside body
     vertices = [(x, y, z), #0
                 (x-neck_x, y+neck_y, z-neck_z), #1
                 (x+neck_x, y+neck_y, z-neck_z), #2
