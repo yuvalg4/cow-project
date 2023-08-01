@@ -2,7 +2,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from texture import load_texture
-from utils import draw_quad, draw_quad_texture, draw_item, draw_item_texture
+from utils import  draw_item, draw_item_texture
 
 def cow(center_x, center_z, len_z, head_angle_display_r, head_angle_display_u, 
         tail_angle_display_r, tail_angle_display_u, left_legs_angle, right_legs_angle):

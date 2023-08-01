@@ -7,6 +7,7 @@ from texture import load_texture
 NUM_PARTS = 20
 CHANGE = 2
 
+# A looping function that draws 20 fence pickets.
 def draw_fence(x, y, z):
     glColor3f(1, 1, 1)
     for i in range(NUM_PARTS):
@@ -19,7 +20,7 @@ def draw_fence(x, y, z):
         draw_one_part_fence(x, y, z)
         x -= CHANGE
 
-# gets buttom left pos
+# gets buttom left pos and draws the picket.
 def draw_one_part_fence(x, y, z):
     fence_texture_id = load_texture("wood_texture.png")
     

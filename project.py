@@ -7,63 +7,15 @@ import numpy as np
 import math
 from fence import draw_fence, NUM_PARTS, CHANGE
 from cow import cow
-from grass import draw_grass
-from light import setup_lighting, updateLight, draw_lightpost
+from general_objects import draw_grass, draw_lightpost, draw_sun
+from light import setup_lighting, updateLight
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient, set_matte_properties, set_shiny_properties
-from sun import draw_sun
+
 import webbrowser
 from rock import draw_rocks_and_sword
 from menu import createMainMenu
+from globals import *
 
-
-
-
-RADIUS_CAM_MIN = 30
-RADIUS_CAM_MAX = 100
-HIGTH_CAM_MIN = 10
-HIGTH_CAM_MAX = 60
-
-# window
-winW, winH = 500, 500
-angle = 0
-aspect = float(winW) / winH
-
-# locations, size, angles
-x_fence = 4
-x_rock = -35
-z_rock = 0
-cow_len_z = 6
-aspect = float(winW) / winH
-
-head_angle_l_r = 0
-head_angle_u_d = 0
-head_up_vector = (0, 1, 0)
-
-tail_angle_l_r = 0
-tail_angle_u_d = 0
-
-body_angle = 0
-body_loc = (0,0)
-body_move = (0,0)
-
-left_legs_angle = 0
-right_legs_angle = 0
-last_leg = "left"
-
-part_of_body = "body"
-
-# eye parameters
-near_view_plane = 0.1
-far_view_plane = 150
-angle_view_plane = 60
-eyeX, eyeY, eyeZ = 0, 20, -60
-radius = abs(eyeZ)
-camera_movement = "up"
-point_of_view = "camera"
-
-# cow eye parameters
-cow_eyeX, cow_eyeY, cow_eyeZ = 0, 2*cow_len_z, -(4/3)*cow_len_z
-cow_refX, cow_refY, cow_refZ = 0, 2*cow_len_z, -10
 
 def InitGlut():
     posX, posY = 100, 100
@@ -452,7 +404,7 @@ def move(key):
         if key == b'.':
             spotLoc[1] += 1
             updateLight()
-        elif key == b',' and spotLoc > 0:
+        elif key == b',' and spotLoc[1] > 5:
             spotLoc[1] -= 1
             updateLight()
 
@@ -482,20 +434,6 @@ def RegisterCallbacks():
     glutIdleFunc(myDisplay)
     glutKeyboardFunc(keyboard)
     glutReshapeFunc(reshape)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def main():

@@ -9,18 +9,24 @@ ROCK_BASE = 7
 ROCK_GAP = 2
 CORNER = 2
 
+# calls seperate functions for setting up the sword in rock scene.
 def draw_rocks_and_sword(x,y,z):
     rock_base = 7
+    # set rock to be matte
     set_matte_properties()
     draw_rock(x, y, z, rock_base, "rock_texture.png")
+    # set sword to be shiny
     set_shiny_properties()
     draw_sword(x+(1/2)*rock_base,y+rock_base,z-(1/2)*rock_base)
+    # set rock to be matte
     set_matte_properties()
     draw_rock(x+rock_base, y, z, (2/3)*rock_base, "rock2_texture.png")
     draw_rock(x-(4/5)*rock_base, y, z-(1/2)*rock_base, (3/4)*rock_base, "rock2_texture.png")
     draw_rock(x, y, z+(1/3)*rock_base, (1/3)*rock_base, "rock2_texture.png")
 
 
+
+# sets up parameters for a rock with give parameters
 def draw_rock(x, y, z, rock_base, texture_name):
     rock_gap = int((1/4)*rock_base+1)
     rock_texture_id = load_texture(texture_name)
@@ -92,6 +98,8 @@ def draw_rock(x, y, z, rock_base, texture_name):
     
     draw_item_texture(vertices, indices, rock_texture_id, 1)
 
+
+# Sets up parameters to draw a metallic sword in rocks.
 def draw_sword(x,y,z):
     height_squar = 7
     width_on_z = 0.5
@@ -113,16 +121,18 @@ def draw_sword(x,y,z):
                ((4,5,6,7),0)]
     
 
-
+    # draw the sworf accorsing to the parameters.
     draw_item(vertices, indices, [(192/255,192/255,192/255)])
 
 
 
-
+    # draws the hilt at give coordinates
     x, y, z = vertices[8]
     draw_hilt(x, y, z, 0, 4)
     draw_hilt(x, y+1, z, 90, 1.5)
 
+
+# draws a wooden hilt at input parameters.
 def draw_hilt(x,y,z,angle,len_z):
     wood_texture_id = load_texture("wood_texture.png")
     slices = 50
