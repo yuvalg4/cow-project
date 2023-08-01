@@ -1,7 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-
+import numpy as np
 
 
 # input: a list of vertices, indices, texture, and texture size to be used.
@@ -86,3 +86,31 @@ def draw_triangle(v1, v2, v3):
     glVertex3f(v2[0], v2[1], v2[2])
     glVertex3f(v3[0], v3[1], v3[2])
     glEnd()
+
+
+# Sets a translation matrix according to parameters for calculations
+def translation_matrix(tx, ty, tz):
+    return np.array([[1, 0, 0, tx],
+                     [0, 1, 0, ty],
+                     [0, 0, 1, tz],
+                     [0, 0, 0, 1]])
+
+
+# sets a rotation matrix according to parameters for calculations
+def rotation_matrix_x(theta):
+    c = np.cos(theta)
+    s = np.sin(theta)
+    return np.array([[1, 0, 0, 0],
+                     [0, c, -s, 0],
+                     [0, s, c, 0],
+                     [0, 0, 0, 1]])
+
+
+# Sets a rotation matrix according to parameters on second axis for calculations
+def rotation_matrix_y(theta):
+    c = np.cos(theta)
+    s = np.sin(theta)
+    return np.array([[c, 0, s, 0],
+                     [0, 1, 0, 0],
+                     [-s, 0, c, 0],
+                     [0, 0, 0, 1]])

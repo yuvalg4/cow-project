@@ -10,12 +10,12 @@ from general_objects import draw_grass, draw_lightpost, draw_sun
 from light import setup_lighting, updateLight
 from light import spotLoc, spotDir, spotlight_exponent, global_ambient, set_matte_properties, set_shiny_properties
 
-import webbrowser
+from utils import rotation_matrix_x, rotation_matrix_y, translation_matrix
 from rock import draw_rocks_and_sword
 from menu import createMainMenu
 from globals import *
 
-
+# Initiate GLUT parameters
 def InitGlut():
     posX, posY = 100, 100
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA)
@@ -24,6 +24,8 @@ def InitGlut():
     glutInit()
     window = glutCreateWindow("Project-Yuval Gabai and Yuval Safran")
 
+
+# Initiate basit paramteres for future endering
 def init():
     createMainMenu()
     setup_lighting()
@@ -34,30 +36,33 @@ def init():
     glEnable(GL_DEPTH_TEST)
     glLoadIdentity()
      
+
+# Display callback function that repeatedly renders what's on the screen.
 def myDisplay():
     global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle, right_legs_angle
     global tail_angle_l_r, tail_angle_u_d, body_loc, body_move, x_fence, cow_len_z
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-    # glEnable(GL_COLOR_MATERIAL)
+    #render matte ovjects
     set_matte_properties()
+    #render "infintite grass" according to the eye location.
     if point_of_view == 'camera':
         draw_grass(eyeX, eyeZ)
     else:
         draw_grass(body_loc[0], body_loc[1])
 
     draw_fence(x_fence, 0, 0) 
-    # glDisable(GL_COLOR_MATERIAL)
 
     draw_rocks_and_sword(x_rock,-2,z_rock)
+    # Draw shiny metallic objects
     set_shiny_properties()
     draw_lightpost()
+    #draw metallic objects
     set_matte_properties()
     draw_sun(-20, 50, 80)
 
     x, z = body_loc
     y = (4/3)*cow_len_z
-
+    # Draw the cow according to the coordinates.
     glPushMatrix()
     glTranslate(body_move[0],y,body_move[1])
     glRotatef(body_angle, 0, 1, 0)  
@@ -73,20 +78,19 @@ def myDisplay():
 
     glutSwapBuffers()   
 
-def show_text(text, xpos, ypos):
-    glRasterPos2f(xpos, ypos)
-    for c in text:
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(c))
 
+# Reshape clalback function that make sure to keep everython proportional on window resize.
 def reshape(width, height):
     global winW, winH, aspect
     winW = width
     winH = height
+    # save aspect ratio
     aspect = float(winW) / winH
     glViewport(0, 0, width, height)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
 
+    # update it according to the perspective and view point.
     gluPerspective(angle_view_plane, aspect, near_view_plane, far_view_plane)
     if point_of_view == "camera":
         gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0)
@@ -95,6 +99,7 @@ def reshape(width, height):
         gluLookAt(cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ, 0, 1, 0)
 
     glMatrixMode(GL_MODELVIEW)
+
 
 def change_cow_eye_parameters():
     global cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ
@@ -136,36 +141,19 @@ def change_cow_eye_parameters():
     cow_refY = cow_ref_homogenic[1]/cow_ref_homogenic[3]
     cow_refZ = cow_ref_homogenic[2]/cow_ref_homogenic[3]
 
-def translation_matrix(tx, ty, tz):
-    return np.array([[1, 0, 0, tx],
-                     [0, 1, 0, ty],
-                     [0, 0, 1, tz],
-                     [0, 0, 0, 1]])
 
-def rotation_matrix_x(theta):
-    c = np.cos(theta)
-    s = np.sin(theta)
-    return np.array([[1, 0, 0, 0],
-                     [0, c, -s, 0],
-                     [0, s, c, 0],
-                     [0, 0, 0, 1]])
-
-def rotation_matrix_y(theta):
-    c = np.cos(theta)
-    s = np.sin(theta)
-    return np.array([[c, 0, s, 0],
-                     [0, 1, 0, 0],
-                     [-s, 0, c, 0],
-                     [0, 0, 0, 1]])
-
+# Key board call back processing.
+# Can register a key for toggling control and then key inputs for movement of that control.
 def keyboard(key, x, y):
     global head_angle_l_r, head_angle_u_d, head_up_vector, spotLock, spotDir
     global spotlight_exponent, global_ambient, part_of_body
     global cow_eyeX, cow_eyeY, cow_eyeZ, cow_refX, cow_refY, cow_refZ
     global eyeX, eyeY, eyeZ, point_of_view
     
+    # Helper function for movement controls
     move(key)
 
+    # List of key for toggling between control of different objects on the screen.
     if (key == b's' or key == b'S'):  
         part_of_body = "spotlight"
 
@@ -189,6 +177,10 @@ def keyboard(key, x, y):
     reshape(winW, winH)
     glutPostRedisplay()
 
+
+# Helper function to move the object in control.
+# In General : IJKL are for movement and function differntly according to the object.
+# Some objects have more functionality.
 def move(key):
     global head_angle_l_r, head_angle_u_d, head_up_vector, part_of_body, body_loc, body_move, last_leg
     global tail_angle_l_r, tail_angle_u_d, body_angle, left_legs_angle, right_legs_angle, x_fence, cow_len_z
@@ -202,7 +194,7 @@ def move(key):
     # then from (x_fence + CHANGE*NUM_PARTS,0,CHANGE*NUM_PARTS) to (x_fence,0,CHANGE*NUM_PARTS)
     bounds_z_down = (-1*CHANGE*NUM_PARTS + (2/3)*cow_len_z, -1*CHANGE*NUM_PARTS - (2/3)*cow_len_z)
 
-    if (key == b'j' or key == b'J'):
+    if (key == b'j' or key == b'J'): # "Left movement" on the following objects.
         if part_of_body == "spotlight" :  # spotlight right    
             spotLoc[0] += 1
             updateLight()
@@ -218,7 +210,7 @@ def move(key):
         elif part_of_body == "tail" and tail_angle_l_r > -25:
             tail_angle_l_r -= 5
 
-        elif part_of_body == "camera":
+        elif part_of_body == "camera": # setting of the camera left movement behavior.
             if eyeX == radius:
                 eyeX -= 5
                 camera_movement = "down"
@@ -241,7 +233,7 @@ def move(key):
             if camera_movement == "up":
                 eyeZ = -eyeZ
             
-    elif (key == b'l' or key == b'L'):
+    elif (key == b'l' or key == b'L'): # "Right movement" on the following objects.
         if part_of_body == "spotlight":
             spotLoc[0] -= 1
             updateLight()
@@ -258,7 +250,7 @@ def move(key):
         elif part_of_body == "tail" and tail_angle_l_r < 25:
             tail_angle_l_r += 5
 
-        elif part_of_body == "camera":
+        elif part_of_body == "camera": # setting of the camera Right movement behavior.
             if eyeX == radius:
                 eyeX -= 5
                 camera_movement = "up"
@@ -281,11 +273,11 @@ def move(key):
             if camera_movement == "up":
                 eyeZ = -eyeZ
 
-    elif (key == b'i' or key == b'I'):
+    elif (key == b'i' or key == b'I'):  # "Up movement" on the following objects.
         if part_of_body == "spotlight":
             spotLoc[2] += 1
             updateLight()
-        elif part_of_body == "body":
+        elif part_of_body == "body": # set body movement limitations such as angles and not going through the fence. including leg movement.
             x, z = body_loc
 
             if 0 <= body_angle < 90:
@@ -329,17 +321,17 @@ def move(key):
         elif part_of_body == "tail" and tail_angle_u_d > -50:
             tail_angle_u_d -= 5
 
-        elif part_of_body == "camera":
+        elif part_of_body == "camera": # setting of the camera Up movement behavior.
             if eyeY < HIGTH_CAM_MAX:
                 eyeY += 5
 
-    elif (key == b'k' or key == b'K'):
+    elif (key == b'k' or key == b'K'):   # "Down movement" on the following objects.
 
         if part_of_body == "spotlight":
             spotLoc[2] -= 1
             updateLight()
 
-        elif part_of_body == "body":
+        elif part_of_body == "body": # set body movement limitations such as angles and not going through the fence. including leg movement while moving back.
             x, z = body_loc
 
             if 0 <= body_angle < 90:
@@ -366,7 +358,8 @@ def move(key):
                 x_fence + CHANGE*NUM_PARTS > x > x_fence):
                 body_move = body_loc
 
-            if last_leg == "left":
+            # Leg movement while moving back.
+            if last_leg == "left":  
                 left_legs_angle = -10
                 right_legs_angle = 10
                 last_leg = "right"
@@ -382,11 +375,11 @@ def move(key):
         elif part_of_body == "tail" and tail_angle_u_d < 0:
             tail_angle_u_d += 5
 
-        elif part_of_body == "camera":
+        elif part_of_body == "camera":  # setting of the camera Down movement behavior.
             if eyeY > HIGTH_CAM_MIN:
                 eyeY -= 5
 
-    elif part_of_body == "camera" and (key == b'+' or key == b'-'):
+    elif part_of_body == "camera" and (key == b'+' or key == b'-'):  # Camera zoom in and out functionality and bounds.
         if key == b'+' and radius > RADIUS_CAM_MIN:
             change = -5
 
@@ -399,49 +392,39 @@ def move(key):
         eyeZ = eyeZ*((radius+change)/radius)
         radius += change
 
-    elif (part_of_body == "spotlight"):
-        if key == b'.':
+    elif (part_of_body == "spotlight"):  # spotlight functionality
+        if key == b'.':  # make spotlight higher.
             spotLoc[1] += 1
             updateLight()
-        elif key == b',' and spotLoc[1] > 5:
+        elif key == b',' and spotLoc[1] > 5:  # make spotlight lower
             spotLoc[1] -= 1
             updateLight()
 
-        elif (key == b']') and spotlight_exponent[0] < 120: # spotlight stonger
-            spotlight_exponent[0] += 5
+        elif (key == b']') and spotlight_exponent[0] > 0: # spotlight stonger
+            spotlight_exponent[0] -= 5
             updateLight()
 
-        elif (key == b'[') and spotlight_exponent[0] > 0: # spotlight weaker
-            spotlight_exponent[0] -= 5
+        elif (key == b'[') and spotlight_exponent[0] < 120: # spotlight weaker
+            spotlight_exponent[0] += 5
             updateLight() 
 
-        elif(key == b'0') and (global_ambient[0] < 1.0 and global_ambient[1] < 1.0 and global_ambient[2] < 1.0):
+        elif(key == b'0') and (global_ambient[0] < 1.0 and global_ambient[1] < 1.0 and global_ambient[2] < 1.0):  # General ambient light stronger.
             global_ambient[0] += 0.05 
             global_ambient[1] += 0.05
             global_ambient[2] += 0.05
             updateLight()
 
-        elif(key == b'9') and (global_ambient[0] > 0.0 and global_ambient[1] > 0.0 and global_ambient[2] > 0.0):
+        elif(key == b'9') and (global_ambient[0] > 0.0 and global_ambient[1] > 0.0 and global_ambient[2] > 0.0):  # General ambient light weaker.
             global_ambient[0] -= 0.05 
             global_ambient[1] -= 0.05
             global_ambient[2] -= 0.05
             updateLight()
 
-#### Callbacks ####
+# Callbacks binding to processor functions
 def RegisterCallbacks():
     glutDisplayFunc(myDisplay)
     glutIdleFunc(myDisplay)
     glutKeyboardFunc(keyboard)
     glutReshapeFunc(reshape)
 
-
-def main():
-    InitGlut()
-    init()
-    RegisterCallbacks()
-    webbrowser.open("Welcome.txt")
-    glutMainLoop()
-
-if __name__ == '__main__':
-    main()
 
