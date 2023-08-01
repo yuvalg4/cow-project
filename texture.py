@@ -3,6 +3,9 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from PIL import Image
 
+
+# Helper function to load the texture to a parameter according to name.
+# return an exception if it goes wrong.
 def load_texture(file_name):
     try:
         image = Image.open(file_name)
