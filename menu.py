@@ -24,7 +24,7 @@ def createMainMenu():
 # - Set Red Ambient Value
 # - Set Green Ambient Value
 # - Set Blue Ambient Value
-# - Reset To Default: resets to 0.4,0.4,0.4
+# - Reset To Default: resets to 0.3,0.3,0.3
 def createAmbientMenu():
     glutAddMenuEntry("Set Red Ambient Value", 1)
     glutAddMenuEntry("Set Green Ambient Value", 2)
@@ -71,7 +71,7 @@ def ProcessAmbientMenu(value):
             #print("updated ambient B")
     
     elif value == 4:
-        global_ambient[0], global_ambient[1], global_ambient[2] = 0.4, 0.4, 0.4 
+        global_ambient[0], global_ambient[1], global_ambient[2] = 0.3, 0.3, 0.3 
        
     updateLight()
     return 1

@@ -1,4 +1,4 @@
-from project import InitGlut, init, RegisterCallbacks
+from callbacks import InitGlut, init, RegisterCallbacks
 from OpenGL.GLUT import *
 import webbrowser
 
