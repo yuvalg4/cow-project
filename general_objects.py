@@ -16,8 +16,6 @@ def draw_grass(centerX,centerZ):
     set_matte_properties()
     #make 2 textures per block for higher resolution feel
     texture_size = 2
-    # glEnable(GL_TEXTURE_2D)
-    # glBindTexture(GL_TEXTURE_2D, grass_texture_id)
     field_size = 500
     gridSize = 20
     cellSize = field_size / gridSize
@@ -28,37 +26,16 @@ def draw_grass(centerX,centerZ):
     for x in range(gridSize):
         for z in range(gridSize):
             
-
-            #glBegin(GL_QUADS)
-            
             x0 = (centerX-field_size) / 2.0 + x * cellSize
             z0 = (centerZ-field_size) / 2.0 + z * cellSize
+            # set normal
             normal = [0, 1, 0]
             p1 = [x0, groundHeight, z0]
             p2 = [x0 + cellSize, groundHeight, z0]
             p3 = [x0 + cellSize, groundHeight, z0 + cellSize]
             p4 = [x0, groundHeight, z0 + cellSize]
 
-            draw_quad_texture(p1, p2, p3, p4, grass_texture_id, 1, normal)
-    #         glTexCoord2f(0.0, 0.0) 
-    #         glNormal3fv(normal) 
-    #         glVertex3f(x0, groundHeight, z0)
-    #         glTexCoord2f(texture_size, 0.0)
-
-    #         glNormal3fv(normal)
-    #         glVertex3f(x0 + cellSize, groundHeight, z0)
-    #         glTexCoord2f(texture_size, texture_size)
-
-    #         glNormal3fv(normal)
-    #         glVertex3f(x0 + cellSize, groundHeight, z0 + cellSize)
-    #         glTexCoord2f(0.0, texture_size)
-
-    #         glNormal3fv(normal)
-    #         glVertex3f(x0, groundHeight, z0 + cellSize)
-
-    #         glEnd()
-
-    # glDisable(GL_TEXTURE_2D)
+            draw_quad_texture(p1, p2, p3, p4, grass_texture_id, texture_size, normal)
 
 
 def draw_lightpost():
