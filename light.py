@@ -65,18 +65,18 @@ def updateLight():
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spotDir)
     
 
+# rotates the spotlight round the pole
 def spot_rotate(theta):
     global spotDir
-    #matrix = translation_matrix(spotLoc[0], spotLoc[1], spotLoc[2]) @ rotation_matrix_y(math.radians(theta)) @ translation_matrix(-spotLoc[0], -spotLoc[1], -spotLoc[2])
+    # set up the homogenous matrix for multiplication
     spotDir_homogen = np.array([spotDir[0], spotDir[1], spotDir[2], 0])
+    # multiply it with the ratation matrix for the rotation. It's a direction vector so it's from 0 and no need to translate.
     spotDir_homogen = rotation_matrix_y(math.radians(theta)) @ spotDir_homogen
-    spotDir[0] = spotDir_homogen[0] #/ spotDir_homogen[3] 
-    spotDir[1] = spotDir_homogen[1] #/ spotDir_homogen[3]
-    spotDir[2] = spotDir_homogen[2] #/ spotDir_homogen[3]
-    print("Direction: ", spotDir)
-    
-    # print("Homogen: ",spotDir_homogen)
-    # print("spot loc: ", spotLoc)
+    # update the global variable.
+    spotDir[0] = spotDir_homogen[0] 
+    spotDir[1] = spotDir_homogen[1] 
+    spotDir[2] = spotDir_homogen[2] 
+
     updateLight()
 
 
