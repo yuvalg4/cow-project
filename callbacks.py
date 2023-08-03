@@ -4,12 +4,10 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import numpy as np
 import math
-from fence import draw_fence, NUM_PARTS, CHANGE
 from cow import cow
-from general_objects import draw_grass, draw_lightpost, draw_sun
+from general_objects import draw_grass, draw_lightpost, draw_sun, draw_fence, draw_rocks_and_sword
 from light import setup_lighting, updateLight, set_matte_properties, set_shiny_properties, spot_rotate
-from utils import rotation_matrix_x, rotation_matrix_y, translation_matrix
-from rock import draw_rocks_and_sword
+from utils import rotation_matrix_x, rotation_matrix_y, translation_matrix 
 from menu import createMainMenu
 from globals import *
 
@@ -37,8 +35,9 @@ def init():
 
 # Display callback function that repeatedly renders what's on the screen.
 def myDisplay():
-    global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle, right_legs_angle
-    global tail_angle_l_r, tail_angle_u_d, body_loc, body_move, x_fence, cow_len_z
+    global angle, winH, head_angle_l_r, head_angle_u_d, head_up_vector, left_legs_angle_u_d 
+    global right_legs_angle_u_d, legs_angle_l_r, tail_angle_l_r, tail_angle_u_d
+    global body_loc, body_move, x_fence, cow_len_z
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     #render matte objects
     set_matte_properties()
@@ -65,14 +64,17 @@ def myDisplay():
     glTranslate(body_move[0],y,body_move[1])
     glRotatef(body_angle, 0, 1, 0)  
     glTranslate(-x,-y,-z)  
-    cow(x, z, cow_len_z, head_angle_l_r, head_angle_u_d, tail_angle_l_r, tail_angle_u_d, left_legs_angle, right_legs_angle)
+    cow(x, z, cow_len_z, head_angle_l_r, head_angle_u_d, tail_angle_l_r, tail_angle_u_d, 
+        left_legs_angle_u_d, right_legs_angle_u_d, legs_angle_l_r)
     glPopMatrix()
 
     body_loc = body_move
 
-    #update legs when not moving
-    left_legs_angle = 0
-    right_legs_angle = 0
+    # update legs when not moving
+    if part_of_body != "legs":
+        left_legs_angle_u_d = 0
+        right_legs_angle_u_d = 0
+        legs_angle_l_r = 0
 
     glutSwapBuffers()   
 
@@ -163,6 +165,9 @@ def keyboard(key, x, y):
     
     elif (key == b'h' or key == b'H' ): 
         part_of_body = "head"
+    
+    elif key == b'f' or key == b'F':
+        part_of_body = "legs"
 
     elif (key == b'c' or key == b'C'):
         part_of_body = "camera"
@@ -184,16 +189,36 @@ def keyboard(key, x, y):
 # Some objects have more functionality.
 def move(key):
     global head_angle_l_r, head_angle_u_d, head_up_vector, part_of_body, body_loc, body_move, last_leg
-    global tail_angle_l_r, tail_angle_u_d, body_angle, left_legs_angle, right_legs_angle, x_fence, cow_len_z
-    global eyeX, eyeY, eyeZ, radius, camera_movement
+    global tail_angle_l_r, tail_angle_u_d, body_angle, left_legs_angle_u_d, right_legs_angle_u_d, legs_angle_l_r
+    global  x_fence, cow_len_z, eyeX, eyeY, eyeZ, radius, camera_movement
 
     # Explanation of cheking in body movement:
+
     # fence from (x_fence,0,0) to (x_fence + CHANGE*NUM_PARTS,0,0)
     bounds_z_up = (0 - (2/3)*cow_len_z, 0 + (2/3)*cow_len_z)
     # then from (x_fence + CHANGE*NUM_PARTS,0,0) to (x_fence + CHANGE*NUM_PARTS,0,CHANGE*NUM_PARTS)
     bounds_x = (x_fence + CHANGE*NUM_PARTS - (2/3)*cow_len_z, x_fence + CHANGE*NUM_PARTS + (2/3)*cow_len_z)
     # then from (x_fence + CHANGE*NUM_PARTS,0,CHANGE*NUM_PARTS) to (x_fence,0,CHANGE*NUM_PARTS)
     bounds_z_down = (-1*CHANGE*NUM_PARTS + (2/3)*cow_len_z, -1*CHANGE*NUM_PARTS - (2/3)*cow_len_z)
+
+    # rocks bounds
+    bounds_rock_center_x = (x_rock - gaps[0], x_rock + rock_bases[0] + gaps[0])
+    bounds_rock_center_z = (z_rock - rock_bases[0] - gaps[0], z_rock + gaps[0])
+
+    bounds_rock_left_x = (x_rock + rock_bases[0] - gaps[1], 
+                          x_rock + rock_bases[0] + rock_bases[1] + gaps[1])
+    bounds_rock_left_z = (z_rock - rock_bases[1] - gaps[1], z_rock + gaps[1])
+
+    bounds_rock_right_x = (x_rock - (4/5)*rock_bases[0] - gaps[2], x_rock - (4/5)*rock_bases[0]
+                           + rock_bases[2] + gaps[2])
+    bounds_rock_right_z = (z_rock - (1/2)*rock_bases[0] - rock_bases[2] - gaps[2], 
+                           z_rock - (1/2)*rock_bases[0] + gaps[2])
+    
+    bounds_rock_behind_x = (x_rock - gaps[3], x_rock + rock_bases[3] + gaps[3])
+    bounds_rock_behind_z = (z_rock - gaps[3], z_rock + rock_bases[3] + gaps[3])
+
+    bounds_rocks_x = [bounds_rock_center_x, bounds_rock_left_x, bounds_rock_right_x, bounds_rock_behind_x]
+    bounds_rocks_z = [bounds_rock_center_z, bounds_rock_left_z, bounds_rock_right_z, bounds_rock_behind_z]
 
     if (key == b'j' or key == b'J'): # "Left movement" on the following objects.
 
@@ -214,6 +239,9 @@ def move(key):
 
         elif part_of_body == "tail" and tail_angle_l_r > -25:
             tail_angle_l_r -= 5
+
+        elif part_of_body == "legs" and legs_angle_l_r > -30:
+            legs_angle_l_r -= 5
 
         elif part_of_body == "camera": # setting of the camera left movement behavior.
             if eyeX == radius:
@@ -257,6 +285,9 @@ def move(key):
 
         elif part_of_body == "tail" and tail_angle_l_r < 25:
             tail_angle_l_r += 5
+
+        elif part_of_body == "legs" and legs_angle_l_r < 30:
+            legs_angle_l_r += 5
 
         elif part_of_body == "camera": # setting of the camera Right movement behavior.
             if eyeX == radius:
@@ -312,15 +343,23 @@ def move(key):
                 (z > bounds_z_down[0] >= body_move[1] or body_move[1] > bounds_z_down[1] >= z) and
                 x_fence + CHANGE*NUM_PARTS > x > x_fence):
                 body_move = body_loc
+
+            # rocks bounds
+            for br_x, br_z in zip(bounds_rocks_x, bounds_rocks_z):
+                if ((z <= br_z[0] - (2/3)*cow_len_z < body_move[1] or 
+                     body_move[1] < br_z[1] + (2/3)*cow_len_z <= z) and 
+                    br_x[0] < x < br_x[1]) or ((x <= br_x[0] - (2/3)*cow_len_z < body_move[0] or 
+                    body_move[0] < br_x[1] + (2/3)*cow_len_z <= x) and br_z[0] < z < br_z[1]):
+                    body_move = body_loc
              
             if last_leg == "left":
-                left_legs_angle = -10
-                right_legs_angle = 10
+                left_legs_angle_u_d = -10
+                right_legs_angle_u_d = 10
                 last_leg = "right"
 
             elif last_leg == "right":
-                left_legs_angle = 10
-                right_legs_angle = -10
+                left_legs_angle_u_d = 10
+                right_legs_angle_u_d = -10
                 last_leg = "left"
         
         elif part_of_body == "head" and head_angle_u_d < 15:
@@ -358,6 +397,7 @@ def move(key):
                 alpha = math.radians(body_angle - 270)
                 body_move = (x - 5*math.cos(alpha),z + 5*math.sin(alpha))
 
+            # fence bounds
             if ((z > bounds_z_up[1] >= body_move[1] or body_move[1] > bounds_z_up[0] >= z) and 
                 x_fence + CHANGE*NUM_PARTS > x > x_fence) or (
                 (x > bounds_x[1] >= body_move[0] or body_move[0] > bounds_x[0] >= x) and
@@ -366,15 +406,23 @@ def move(key):
                 x_fence + CHANGE*NUM_PARTS > x > x_fence):
                 body_move = body_loc
 
+            # rocks bounds
+            for br_x, br_z in zip(bounds_rocks_x, bounds_rocks_z):
+                if ((z <= br_z[0] - (2/3)*cow_len_z < body_move[1] or 
+                     body_move[1] <= br_z[1] + (2/3)*cow_len_z < z) and 
+                    br_x[0] < x < br_x[1]) or ((x <= br_x[0] - (2/3)*cow_len_z < body_move[0] or 
+                    body_move[0] <= br_x[1] + (2/3)*cow_len_z < x) and br_z[0] < z < br_z[1]):
+                    body_move = body_loc
+
             # Leg movement while moving back.
             if last_leg == "left":  
-                left_legs_angle = -10
-                right_legs_angle = 10
+                left_legs_angle_u_d = -10
+                right_legs_angle_u_d = 10
                 last_leg = "right"
 
             elif last_leg == "right":
-                left_legs_angle = 10
-                right_legs_angle = -10
+                left_legs_angle_u_d = 10
+                right_legs_angle_u_d = -10
                 last_leg = "left"
         
         elif part_of_body == "head" and head_angle_u_d > -30:
