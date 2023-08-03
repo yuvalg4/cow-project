@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from texture import load_texture
 from light import set_matte_properties, spotLoc
-from utils import draw_item_texture
+from utils import draw_item_texture, draw_quad_texture
 from globals import *
 
 
@@ -16,10 +16,8 @@ def draw_grass(centerX,centerZ):
     set_matte_properties()
     #make 2 textures per block for higher resolution feel
     texture_size = 2
-    glEnable(GL_TEXTURE_2D)
-    glBindTexture(GL_TEXTURE_2D, grass_texture_id)
     field_size = 500
-    gridSize = 13
+    gridSize = 20
     cellSize = field_size / gridSize
     groundHeight = 0.0
 
@@ -27,25 +25,17 @@ def draw_grass(centerX,centerZ):
     # Enables light to show up properly on the ground.
     for x in range(gridSize):
         for z in range(gridSize):
-            glBegin(GL_QUADS)
             
             x0 = (centerX-field_size) / 2.0 + x * cellSize
             z0 = (centerZ-field_size) / 2.0 + z * cellSize
-            glTexCoord2f(0.0, 0.0)  
-            glVertex3f(x0, groundHeight, z0)
-            glTexCoord2f(texture_size, 0.0)
+            # set normal
+            normal = [0, 1, 0]
+            p1 = [x0, groundHeight, z0]
+            p2 = [x0 + cellSize, groundHeight, z0]
+            p3 = [x0 + cellSize, groundHeight, z0 + cellSize]
+            p4 = [x0, groundHeight, z0 + cellSize]
 
-            glVertex3f(x0 + cellSize, groundHeight, z0)
-            glTexCoord2f(texture_size, texture_size)
-
-            glVertex3f(x0 + cellSize, groundHeight, z0 + cellSize)
-            glTexCoord2f(0.0, texture_size)
-
-            glVertex3f(x0, groundHeight, z0 + cellSize)
-
-            glEnd()
-
-    glDisable(GL_TEXTURE_2D)
+            draw_quad_texture(p1, p2, p3, p4, grass_texture_id, texture_size, normal)
 
 
 def draw_lightpost():
@@ -53,7 +43,7 @@ def draw_lightpost():
 
     #set up coordinates for rendering the light post. The tip is where the spotlight currently is.
     x, y, z = spotLoc[0], 0 , spotLoc[2]
-    height_squar = spotLoc[1] - 2
+    height_squar = spotLoc[1] - 4
     height_triangle = 2
     width_on_z = 1
     width_on_x = 1.5
@@ -80,20 +70,20 @@ def draw_lightpost():
     draw_lamp_head()
 
     #for debugging spotlight with a line
-    # lineWidth = 2.0
-    # glLineWidth(lineWidth)
-    # glColor3f(1.0, 1.0, 0.0)  # Yellow color
+    lineWidth = 2.0
+    glLineWidth(lineWidth)
+    glColor3f(1.0, 1.0, 0.0)  # Yellow color
 
-    # # Render the line representing the spotlight
-    # glBegin(GL_LINES)
-    # glVertex3f(spotLoc[0], spotLoc[1], spotLoc[2])  # Line start point
-    # glVertex3f(spotLoc[0] + spotDir[0], spotLoc[1]+ spotDir[1], spotLoc[2] + spotDir[2])      # Line end point
-    # glEnd()
+    # Render the line representing the spotlight
+    glBegin(GL_LINES)
+    glVertex3f(spotLoc[0], spotLoc[1], spotLoc[2])  # Line start point
+    glVertex3f(spotLoc[0] + spotDir[0], spotLoc[1]+ spotDir[1], spotLoc[2] + spotDir[2])      # Line end point
+    glEnd()
     
    
 # renders the head of the lightpost as a cone
 def draw_lamp_head():
-    x, y, z = spotLoc[0], 0 , spotLoc[2]
+    x, y, z = spotLoc[0], spotLoc[1] , spotLoc[2]
     glEnable(GL_BLEND)
     #enable blending so the cone lets light through and set up parameters
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -103,11 +93,12 @@ def draw_lamp_head():
     glMaterialfv(GL_FRONT, GL_SHININESS, 100)
     glPushMatrix()
     
-    glTranslatef(x - 1 , spotLoc[1]-1.5, z + 3.5)
-    glRotate(145, 0, 1, 0)
-    glRotate(-25, 1, 0, 0)
+    glTranslatef(x+0.75, y-2, z+0.5 )
+    # glRotate(145, 0, 1, 0)
+    # glRotate(-25, 1, 0, 0)
 
-    gluCylinder(gluNewQuadric(), 3.0, 0.0, 5.0, 10, 10)  # Draw the cone
+    quad = gluNewQuadric()
+    gluSphere(quad, 3, 50, 50)
     
     glPopMatrix()
     glDisable(GL_BLEND)

@@ -118,7 +118,7 @@ def draw_sword(x,y,z):
                ((1, 2, 6, 5),0),
                ((3, 2, 6, 7),0),
                ((3, 0, 4, 7),0),
-               ((4,5,6,7),0)]
+               ((4, 5, 6, 7),0)]
     
 
     # draw the sworf accorsing to the parameters.

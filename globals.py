@@ -1,7 +1,9 @@
+import math
 RADIUS_CAM_MIN = 30
 RADIUS_CAM_MAX = 100
 HIGTH_CAM_MIN = 10
 HIGTH_CAM_MAX = 60
+
 
 # window
 winW, winH = 500, 500
@@ -47,9 +49,9 @@ cow_refX, cow_refY, cow_refZ = 0, 2*cow_len_z, -10
 
 #spotlight params:
 spotLoc = [-16, 20, -20, 1]  # Position of the spotlight
-spotDir = [-5, -5 , 5]  # Direction of the spotlight
+spotDir = [-1/math.sqrt(3), -1/math.sqrt(3), 1/math.sqrt(3), 0 ]  # Direction of the spotlight
 spotlight_exponent = [20.0]  # Exponent that controls the intensity distribution of the spotlight
-global_ambient = [0.4, 0.4, 0.4, 1.0] # global ambient lighting
+global_ambient = [0.3, 0.3, 0.3, 1.0] # global ambient lighting
 
 #Fence parameters
 NUM_PARTS = 20
