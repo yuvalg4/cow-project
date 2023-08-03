@@ -87,6 +87,34 @@ def draw_triangle(v1, v2, v3):
     glVertex3f(v3[0], v3[1], v3[2])
     glEnd()
 
+def textured_sphere(center_x, center_y, center_z, len_x, len_y, len_z, texture_id):
+    slices = 50
+    stacks = 50
+
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, texture_id)
+
+    glPushMatrix()
+    glTranslatef(center_x, center_y, center_z)
+    glScalef(len_x, len_y, len_z)
+
+    quad = gluNewQuadric()
+    gluQuadricTexture(quad, GL_TRUE)
+    gluSphere(quad, 1, slices, stacks)
+
+    glPopMatrix()
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glDisable(GL_TEXTURE_2D)
+
+def draw_solid_sphere(center_x, center_y, center_z, len_x, len_y, len_z):
+    slices = 50
+    stacks = 50
+    glPushMatrix()
+    glTranslatef(center_x, center_y, center_z)
+    glScalef(len_x, len_y, len_z)
+    glutSolidSphere(1, slices, stacks)
+    glPopMatrix()
 
 # Sets a translation matrix according to parameters for calculations
 def translation_matrix(tx, ty, tz):
@@ -104,7 +132,6 @@ def rotation_matrix_x(theta):
                      [0, c, -s, 0],
                      [0, s, c, 0],
                      [0, 0, 0, 1]])
-
 
 # Sets a rotation matrix according to parameters on second axis for calculations
 def rotation_matrix_y(theta):

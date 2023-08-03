@@ -4,25 +4,22 @@ from OpenGL.GLUT import *
 from utils import draw_item_texture, draw_item
 from texture import load_texture
 from light import set_matte_properties, set_shiny_properties
+from globals import ROCK_BASE
 
-ROCK_BASE = 7
-ROCK_GAP = 2
-CORNER = 2
 
 # calls seperate functions for setting up the sword in rock scene.
 def draw_rocks_and_sword(x,y,z):
-    rock_base = 7
     # set rock to be matte
     set_matte_properties()
-    draw_rock(x, y, z, rock_base, "rock_texture.png")
+    draw_rock(x, y, z, ROCK_BASE, "rock_texture.png")
     # set sword to be shiny
     set_shiny_properties()
-    draw_sword(x+(1/2)*rock_base,y+rock_base,z-(1/2)*rock_base)
+    draw_sword(x+(1/2)*ROCK_BASE,y+ROCK_BASE,z-(1/2)*ROCK_BASE)
     # set rock to be matte
     set_matte_properties()
-    draw_rock(x+rock_base, y, z, (2/3)*rock_base, "rock2_texture.png")
-    draw_rock(x-(4/5)*rock_base, y, z-(1/2)*rock_base, (3/4)*rock_base, "rock2_texture.png")
-    draw_rock(x, y, z+(1/3)*rock_base, (1/3)*rock_base, "rock2_texture.png")
+    draw_rock(x+ROCK_BASE, y, z, (2/3)*ROCK_BASE, "rock2_texture.png")
+    draw_rock(x-(4/5)*ROCK_BASE, y, z-(1/2)*ROCK_BASE, (3/4)*ROCK_BASE, "rock2_texture.png")
+    draw_rock(x, y, z+(1/3)*ROCK_BASE, (1/3)*ROCK_BASE, "rock2_texture.png")
 
 
 

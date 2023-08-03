@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from texture import load_texture
 from light import set_matte_properties, spotLoc
-from utils import draw_item_texture
+from utils import draw_item_texture, textured_sphere, draw_solid_sphere
 from globals import *
 
 
@@ -130,3 +130,10 @@ def draw_sun(center_x, center_y, center_z):
 
     glBindTexture(GL_TEXTURE_2D, 0)
     glDisable(GL_TEXTURE_2D)
+
+    
+
+
+
+
+

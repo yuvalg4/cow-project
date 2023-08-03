@@ -2,10 +2,10 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from texture import load_texture
-from utils import  draw_item, draw_item_texture
+from utils import  draw_item, draw_item_texture, textured_sphere, draw_solid_sphere
 
 def cow(center_x, center_z, len_z, head_angle_display_r, head_angle_display_u, 
-        tail_angle_display_r, tail_angle_display_u, left_legs_angle, right_legs_angle):
+        tail_angle_display_r, tail_angle_display_u, left_legs_angle_u, right_legs_angle_u, legs_angle_l_r):
     leg_len = len_z
     len_x = len_y = (2/3)*len_z
     center_y = len_y/2 + leg_len
@@ -26,22 +26,23 @@ def cow(center_x, center_z, len_z, head_angle_display_r, head_angle_display_u,
     # legs
     draw_tail(center_x, center_y, center_z + (7/8)*len_z, len_x, 
               tail_angle_display_r, tail_angle_display_u)
-    draw_legs(center_x, center_y, center_z, len_x, len_z, left_legs_angle, right_legs_angle)
+    draw_legs(center_x, center_y, center_z, len_x, len_z, left_legs_angle_u, right_legs_angle_u, legs_angle_l_r)
 
-def draw_legs(center_x, center_y, center_z, len_x, len_z, left_angle, right_angle):
+def draw_legs(center_x, center_y, center_z, len_x, len_z, left_angle_u, right_angle_u, angle_l_r):
     glColor3f(1,1,1)
     weidth_x = (3/7)*len_x
     weidth_z = (3/2)*weidth_x
 
-    draw_leg(center_x - (1/2)*len_x, center_y, center_z - (3/4)*len_z , weidth_x, weidth_z, left_angle)
+    draw_leg(center_x - (1/2)*len_x, center_y, center_z - (3/4)*len_z , weidth_x, weidth_z, 
+             left_angle_u, angle_l_r)
     draw_leg(center_x - (1/2)*len_x, center_y, center_z + (3/4)*len_z - weidth_z, 
-             weidth_x, weidth_z, left_angle)
+             weidth_x, weidth_z, left_angle_u, angle_l_r)
     draw_leg(center_x + (1/2)*len_x - weidth_x, center_y, center_z - (3/4)*len_z, 
-             weidth_x, weidth_z, right_angle)
+             weidth_x, weidth_z, right_angle_u, angle_l_r)
     draw_leg(center_x + (1/2)*len_x - weidth_x, center_y, center_z + (3/4)*len_z - weidth_z, 
-             weidth_x, weidth_z, right_angle)
+             weidth_x, weidth_z, right_angle_u, angle_l_r)
     
-def draw_leg(x,y,z, weidth_x, weidth_z, angle):
+def draw_leg(x,y,z, weidth_x, weidth_z, angle_u, angle_l_r):
     hoof_heigth = weidth_x
     vertices = [(x, y, z), # first four top ssquare
                 (x, y, z + weidth_z),
@@ -69,35 +70,16 @@ def draw_leg(x,y,z, weidth_x, weidth_z, angle):
 
     glPushMatrix()
     glTranslate(x,y,z)
-    glRotatef(angle, 1, 0, 0)
+    glRotatef(angle_u, 1, 0, 0)
+    glRotatef(angle_l_r, 0, 0, 1)
     glTranslate(-x,-y,-z)
     draw_item_texture(vertices, indices, leg_texture_id, 1)
     glPopMatrix()
 
 def draw_body(center_x, center_y, center_z, len_x, len_y, len_z):
-    textured_body(center_x, center_y, center_z, len_x, len_y, len_z)
-    draw_udders(center_x, center_y-(3/4)*len_y, center_z, len_x/2)
-
-def textured_body(center_x, center_y, center_z, len_x, len_y, len_z):
     cow_texture_id = load_texture("cow_texture.png")
-    slices = 50
-    stacks = 50
-
-    glEnable(GL_TEXTURE_2D)
-    glBindTexture(GL_TEXTURE_2D, cow_texture_id)
-
-    glPushMatrix()
-    glTranslatef(center_x, center_y, center_z)
-    glScalef(len_x, len_y, len_z)
-
-    quad = gluNewQuadric()
-    gluQuadricTexture(quad, GL_TRUE)
-    gluSphere(quad, 1, slices, stacks)
-
-    glPopMatrix()
-
-    glBindTexture(GL_TEXTURE_2D, 0)
-    glDisable(GL_TEXTURE_2D)
+    textured_sphere(center_x, center_y, center_z, len_x, len_y, len_z, cow_texture_id)
+    draw_udders(center_x, center_y-(3/4)*len_y, center_z, len_x/2)
 
 def draw_head(x, y, z, neck_x, neck_y, neck_z, head_angle_display_r, head_angle_display_u): # (x,y,z) point inside body
     vertices = [(x, y, z), #0
@@ -241,11 +223,3 @@ def draw_tail(x, y, z, len, tail_angle_display_r, tail_angle_display_u):
                       (3/2)*tail_weidth, (2/3)*tail_weidth)
     glPopMatrix()
 
-def draw_solid_sphere(center_x, center_y, center_z, len_x, len_y, len_z):
-    slices = 50
-    stacks = 50
-    glPushMatrix()
-    glTranslatef(center_x, center_y, center_z)
-    glScalef(len_x, len_y, len_z)
-    glutSolidSphere(1, slices, stacks)
-    glPopMatrix()
