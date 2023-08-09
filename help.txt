@@ -58,3 +58,8 @@ first, lets start with the basic controls. In order to toggle between different 
     "0" - Increase the general ambient light intensity
     "9" - Lower the general ambient light intensity
 
+“R” – Spotlight Rotation 
+     “J” – Turn anti - clockwise. 
+     “L” – Turn clockwise. 
+ 
+
